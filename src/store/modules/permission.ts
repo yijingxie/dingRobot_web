@@ -16,17 +16,24 @@ export const usePermissionStore = defineStore("permission", () => {
    * 生成动态路由
    */
   function generateRoutes() {
-    return new Promise<RouteRecordRaw[]>((resolve, reject) => {
-      MenuAPI.getRoutes()
-        .then((data) => {
-          const dynamicRoutes = transformRoutes(data);
-          routes.value = constantRoutes.concat(dynamicRoutes);
-          resolve(dynamicRoutes);
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
+    const result: any = MenuAPI.getRoutes();
+    const dynamicRoutes = transformRoutes(result.data);
+    routes.value = constantRoutes.concat(dynamicRoutes);
+    return dynamicRoutes;
+    // return new Promise<RouteRecordRaw[]>((resolve, reject) => {
+    // 通过接口获取该用户的动态路由
+    // MenuAPI.getRoutes()
+    //   .then((data) => {
+    //     // dynamicRoutes只包含返回的路由（不包含静态路由）
+    //     const dynamicRoutes = transformRoutes(data);
+    //     // routes.value是当前用户的全部路由（静态路由 + 返回的异步路由）
+    //     routes.value = constantRoutes.concat(dynamicRoutes);
+    //     resolve(dynamicRoutes);
+    //   })
+    //   .catch((error) => {
+    //     reject(error);
+    //   });
+    // });
   }
 
   /**

@@ -1,10 +1,5 @@
 import request from "@/utils/request";
 
-// 枚举接口
-enum API {
-  LOGIN_URL = "/ding/login",
-}
-
 class AuthAPI {
   // 登录接口
   static login(data: LoginData) {
@@ -12,7 +7,7 @@ class AuthAPI {
     formData.append("mobile", data.mobile);
     formData.append("password", data.password);
     return request<any, LoginResult>({
-      url: API.LOGIN_URL,
+      url: "/ding/login",
       method: "post",
       data: formData,
     });

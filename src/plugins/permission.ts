@@ -13,23 +13,20 @@ export function setupPermission() {
   // 白名单路由
   const whiteList = ["/login"];
 
-  router.beforeEach(async (to, from, next) => {
-    console.log("前置守卫");
+  // 前置守卫
+  router.beforeEach(async (to: any, from: any, next: any) => {
+    // 进度条开始
     NProgress.start();
-    const hasToken = localStorage.getItem("TOKEN_KEY");
-
+    const hasToken = localStorage.getItem(TOKEN_KEY);
     if (hasToken) {
-      console.log("token");
       if (to.path === "/login") {
         // 如果已登录，跳转到首页
         next({ path: "/" });
         NProgress.done();
       } else {
-        console.log("获取用户信息");
         const userStore = useUserStore();
-        const hasRoles = userStore.user.username;
-        console.log("hasRoles");
-        console.log(hasRoles);
+        const hasRoles = userStore.user.roles && userStore.user.roles.length;
+        // 判断有没有用户信息
         if (hasRoles) {
           // 如果未匹配到任何路由，跳转到404页面
           if (to.matched.length === 0) {
@@ -44,10 +41,14 @@ export function setupPermission() {
             next();
           }
         } else {
+          // 没有用户信息发请求获取用户信息
           const permissionStore = usePermissionStore();
           try {
+            // 获取用户角色
             await userStore.getUserInfo();
+            // 生成动态路由
             const dynamicRoutes = await permissionStore.generateRoutes();
+            // // 把异步路由加到router里面
             dynamicRoutes.forEach((route: RouteRecordRaw) =>
               router.addRoute(route)
             );

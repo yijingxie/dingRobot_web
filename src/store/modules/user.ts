@@ -10,6 +10,7 @@ export const useUserStore = defineStore("user", () => {
     token: "",
     roles: [], // 角色
     perms: [], // 权限
+    avatar: "", // 头像
   });
 
   /**
@@ -24,7 +25,7 @@ export const useUserStore = defineStore("user", () => {
         .then((result) => {
           user.value.username = result.name;
           user.value.token = result.auth_token;
-          localStorage.setItem("TOKEN_KEY", result.auth_token);
+          localStorage.setItem(TOKEN_KEY, result.auth_token);
           resolve();
         })
         .catch((error) => {
@@ -35,24 +36,51 @@ export const useUserStore = defineStore("user", () => {
 
   // 获取信息(用户昵称、头像、角色集合、权限集合)
   function getUserInfo() {
-    return new Promise<UserInfo>((resolve, reject) => {
-      UserAPI.getInfo()
-        .then((data) => {
-          if (!data) {
-            reject("Verification failed, please Login again.");
-            return;
-          }
-          if (!data.roles || data.roles.length <= 0) {
-            reject("getUserInfo: roles must be a non-null array!");
-            return;
-          }
-          Object.assign(user.value, { ...data });
-          resolve(data);
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
+    user.value.roles.push("admin");
+    user.value.avatar =
+      "https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif?imageView2/1/w/80/h/80";
+    user.value.perms = [
+      "sys:menu:delete",
+      "sys:dept:edit",
+      "sys:dict_type:add",
+      "sys:dict:edit",
+      "sys:dict:delete",
+      "sys:dict_type:edit",
+      "sys:menu:add",
+      "sys:user:add",
+      "sys:role:edit",
+      "sys:dept:delete",
+      "sys:user:edit",
+      "sys:user:delete",
+      "sys:user:password:reset",
+      "sys:dept:add",
+      "sys:role:delete",
+      "sys:dict_type:delete",
+      "sys:menu:edit",
+      "sys:dict:add",
+      "sys:role:add",
+      "sys:user:query",
+      "sys:user:export",
+      "sys:user:import",
+    ];
+    // return new Promise<UserInfo>((resolve, reject) => {
+    //   UserAPI.getInfo()
+    //     .then((data) => {
+    //       if (!data) {
+    //         reject("Verification failed, please Login again.");
+    //         return;
+    //       }
+    //       if (!data.roles || data.roles.length <= 0) {
+    //         reject("getUserInfo: roles must be a non-null array!");
+    //         return;
+    //       }
+    //       Object.assign(user.value, { ...data });
+    //       resolve(data);
+    //     })
+    //     .catch((error) => {
+    //       reject(error);
+    //     });
+    // });
   }
 
   // user logout
