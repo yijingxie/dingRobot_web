@@ -14,19 +14,22 @@ export function setupPermission() {
   const whiteList = ["/login"];
 
   router.beforeEach(async (to, from, next) => {
+    console.log("前置守卫");
     NProgress.start();
-    const hasToken = localStorage.getItem(TOKEN_KEY);
+    const hasToken = localStorage.getItem("TOKEN_KEY");
 
     if (hasToken) {
+      console.log("token");
       if (to.path === "/login") {
         // 如果已登录，跳转到首页
         next({ path: "/" });
         NProgress.done();
       } else {
+        console.log("获取用户信息");
         const userStore = useUserStore();
-        const hasRoles =
-          userStore.user.roles && userStore.user.roles.length > 0;
-
+        const hasRoles = userStore.user.username;
+        console.log("hasRoles");
+        console.log(hasRoles);
         if (hasRoles) {
           // 如果未匹配到任何路由，跳转到404页面
           if (to.matched.length === 0) {

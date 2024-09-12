@@ -31,21 +31,10 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
   (response: AxiosResponse) => {
-    // 检查配置的响应类型是否为二进制类型（'blob' 或 'arraybuffer'）, 如果是，直接返回响应对象
-    if (
-      response.config.responseType === "blob" ||
-      response.config.responseType === "arraybuffer"
-    ) {
-      return response;
-    }
-
     const { code, data, msg } = response.data;
-    if (code === ResultEnum.SUCCESS) {
+    if (code == ResultEnum.SUCCESS) {
       return data;
     }
-
-    ElMessage.error(msg || "系统出错");
-    return Promise.reject(new Error(msg || "Error"));
   },
   (error: any) => {
     // 异常处理

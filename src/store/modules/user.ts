@@ -6,8 +6,10 @@ import { TOKEN_KEY } from "@/enums/CacheEnum";
 
 export const useUserStore = defineStore("user", () => {
   const user = ref<UserInfo>({
-    roles: [],
-    perms: [],
+    username: "",
+    token: "",
+    roles: [], // 角色
+    perms: [], // 权限
   });
 
   /**
@@ -19,9 +21,10 @@ export const useUserStore = defineStore("user", () => {
   function login(loginData: LoginData) {
     return new Promise<void>((resolve, reject) => {
       AuthAPI.login(loginData)
-        .then((data) => {
-          const { tokenType, accessToken } = data;
-          localStorage.setItem(TOKEN_KEY, tokenType + " " + accessToken); // Bearer eyJhbGciOiJIUzI1NiJ9.xxx.xxx
+        .then((result) => {
+          user.value.username = result.name;
+          user.value.token = result.auth_token;
+          localStorage.setItem("TOKEN_KEY", result.auth_token);
           resolve();
         })
         .catch((error) => {

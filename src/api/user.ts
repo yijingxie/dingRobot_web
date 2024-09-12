@@ -18,6 +18,12 @@ export default UserAPI;
 
 /** 登录用户信息 */
 export interface UserInfo {
+  /* 用户手机号 */
+  mobile?: string;
+
+  /* 用户token */
+  token: string;
+
   /** 用户ID */
   userId?: number;
 

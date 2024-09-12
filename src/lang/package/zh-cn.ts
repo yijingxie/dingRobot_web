@@ -6,14 +6,14 @@ export default {
   },
   // 登录页面国际化
   login: {
-    username: "用户名",
+    mobile: "手机号",
     password: "密码",
     login: "登 录",
     captchaCode: "验证码",
     capsLock: "大写锁定已打开",
     message: {
       username: {
-        required: "请输入用户名",
+        required: "请输入手机号",
       },
       password: {
         required: "请输入密码",

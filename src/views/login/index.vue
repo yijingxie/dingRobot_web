@@ -24,15 +24,15 @@
         :rules="loginRules"
         class="login-form"
       >
-        <!-- 用户名 -->
-        <el-form-item prop="username">
+        <!--  手机号 -->
+        <el-form-item prop="mobile">
           <div class="input-wrapper">
             <i-ep-user class="mx-2" />
             <el-input
-              ref="username"
-              v-model="loginData.username"
-              :placeholder="$t('login.username')"
-              name="username"
+              ref="mobile"
+              v-model="loginData.mobile"
+              :placeholder="$t('login.mobile')"
+              name="mobile"
               size="large"
               class="h-[48px]"
             />
@@ -63,27 +63,6 @@
           </el-form-item>
         </el-tooltip>
 
-        <!-- 验证码 -->
-        <el-form-item prop="captchaCode">
-          <div class="input-wrapper">
-            <svg-icon icon-class="captcha" class="mx-2" />
-            <el-input
-              v-model="loginData.captchaCode"
-              auto-complete="off"
-              size="large"
-              class="flex-1"
-              :placeholder="$t('login.captchaCode')"
-              @keyup.enter="handleLoginSubmit"
-            />
-
-            <el-image
-              @click="getCaptcha"
-              :src="captchaBase64"
-              class="captcha-image"
-            />
-          </div>
-        </el-form-item>
-
         <!-- 登录按钮 -->
         <el-button
           :loading="loading"
@@ -97,7 +76,7 @@
 
         <!-- 账号密码提示 -->
         <div class="mt-10 text-sm">
-          <span>{{ $t("login.username") }}: admin</span>
+          <span>{{ $t("login.mobile") }}: 18737480171</span>
           <span class="ml-4">{{ $t("login.password") }}: 123456</span>
         </div>
       </el-form>
@@ -154,15 +133,13 @@ const captchaBase64 = ref();
 const loginFormRef = ref<FormInstance>();
 
 const loginData = ref<LoginData>({
-  username: "admin",
+  mobile: "18737480171",
   password: "123456",
-  captchaKey: "",
-  captchaCode: "",
 });
 
 const loginRules = computed(() => {
   return {
-    username: [
+    mobile: [
       {
         required: true,
         trigger: "blur",
@@ -181,23 +158,8 @@ const loginRules = computed(() => {
         trigger: "blur",
       },
     ],
-    captchaCode: [
-      {
-        required: true,
-        trigger: "blur",
-        message: t("login.message.captchaCode.required"),
-      },
-    ],
   };
 });
-
-/** 获取验证码 */
-function getCaptcha() {
-  AuthAPI.getCaptcha().then((data) => {
-    loginData.value.captchaKey = data.captchaKey;
-    captchaBase64.value = data.captchaBase64;
-  });
-}
 
 /** 登录表单提交 */
 function handleLoginSubmit() {
@@ -207,11 +169,10 @@ function handleLoginSubmit() {
       userStore
         .login(loginData.value)
         .then(() => {
-          const { path, queryParams } = parseRedirect();
-          router.push({ path: path, query: queryParams });
+          router.push("/");
         })
-        .catch(() => {
-          getCaptcha();
+        .catch((error) => {
+          console.log(error);
         })
         .finally(() => {
           loading.value = false;
@@ -262,10 +223,6 @@ function checkCapslock(event: KeyboardEvent) {
     isCapslock.value = event.getModifierState("CapsLock");
   }
 }
-
-onMounted(() => {
-  getCaptcha();
-});
 </script>
 
 <style lang="scss" scoped></style>

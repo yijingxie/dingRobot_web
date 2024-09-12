@@ -1,20 +1,20 @@
 import request from "@/utils/request";
 
+// 枚举接口
+enum API {
+  LOGIN_URL = "/ding/login",
+}
+
 class AuthAPI {
   // 登录接口
   static login(data: LoginData) {
     const formData = new FormData();
-    formData.append("username", data.username);
+    formData.append("mobile", data.mobile);
     formData.append("password", data.password);
-    formData.append("captchaKey", data.captchaKey);
-    formData.append("captchaCode", data.captchaCode);
     return request<any, LoginResult>({
-      url: "/api/v1/auth/login",
+      url: API.LOGIN_URL,
       method: "post",
       data: formData,
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
     });
   }
 
@@ -40,25 +40,38 @@ export default AuthAPI;
 /** 登录请求参数 */
 export interface LoginData {
   /** 用户名 */
-  username: string;
+  mobile: string;
   /** 密码 */
   password: string;
-  /** 验证码缓存key */
-  captchaKey: string;
-  /** 验证码 */
-  captchaCode: string;
+}
+
+export interface ResponseData {
+  code: number;
+  msg: string;
+}
+
+export interface Authorities {
+  CreatedAt: string;
+  UpdatedAt: string;
+  authorityId: number;
+  authorityName: string;
+  menus: null;
+  defaultRouter: string;
 }
 
 /** 登录响应 */
-export interface LoginResult {
-  /** 访问token */
-  accessToken?: string;
-  /** 过期时间(单位：毫秒) */
-  expires?: number;
-  /** 刷新token */
-  refreshToken?: string;
-  /** token 类型 */
-  tokenType?: string;
+export interface LoginResult extends ResponseData {
+  userid: string;
+  CreatedAt: string;
+  UpdatedAt: string;
+  name: string;
+  mobile: string;
+  password: string;
+  dept_id?: number;
+  authorityId?: number;
+  authorities: Authorities[];
+  title: string;
+  auth_token: string;
 }
 
 /** 验证码响应 */
