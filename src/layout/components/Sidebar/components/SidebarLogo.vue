@@ -1,13 +1,16 @@
 <template>
   <div class="logo-container">
     <transition enter-active-class="animate__animated animate__fadeInLeft">
+      <!-- logo图片 -->
       <router-link v-if="collapse" class="wh-full flex-center" to="/">
         <img v-if="settingsStore.sidebarLogo" :src="logo" class="logo-image" />
       </router-link>
 
       <router-link v-else class="wh-full flex-center" to="/">
+        <!-- logo图片 -->
         <img v-if="settingsStore.sidebarLogo" :src="logo" class="logo-image" />
-        <span class="logo-title"> {{ defaultSettings.title }}</span>
+        <!-- 标题 -->
+        <span class="logo-title">{{ defaultSettings.title }}</span>
       </router-link>
     </transition>
   </div>

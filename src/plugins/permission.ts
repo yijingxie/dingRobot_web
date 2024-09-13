@@ -12,6 +12,7 @@ import { usePermissionStore, useUserStore } from "@/store";
 export function setupPermission() {
   // 白名单路由
   const whiteList = ["/login"];
+  console.log("前置守卫");
 
   // 前置守卫
   router.beforeEach(async (to: any, from: any, next: any) => {

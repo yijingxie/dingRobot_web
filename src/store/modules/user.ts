@@ -6,8 +6,9 @@ import { TOKEN_KEY } from "@/enums/CacheEnum";
 
 export const useUserStore = defineStore("user", () => {
   const user = ref<UserInfo>({
-    username: "",
-    token: "",
+    token: "", // 用户token
+    username: "", // 用户名称
+    userId: "", // 用户id
     roles: [], // 角色
     perms: [], // 权限
     avatar: "", // 头像
@@ -24,6 +25,7 @@ export const useUserStore = defineStore("user", () => {
       AuthAPI.login(loginData)
         .then((result) => {
           user.value.username = result.name;
+          user.value.userId = result.userid;
           user.value.token = result.auth_token;
           localStorage.setItem(TOKEN_KEY, result.auth_token);
           resolve();
@@ -36,6 +38,8 @@ export const useUserStore = defineStore("user", () => {
 
   // 获取信息(用户昵称、头像、角色集合、权限集合)
   function getUserInfo() {
+    console.log("发请求获取用户信息");
+    user.value.username = "闫佳鹏";
     user.value.roles.push("admin");
     user.value.avatar =
       "https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif?imageView2/1/w/80/h/80";

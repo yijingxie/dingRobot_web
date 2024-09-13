@@ -8,8 +8,10 @@
     </div>
     <!-- layout left || layout top -->
     <template v-else>
+      <!-- logo区域 -->
       <SidebarLogo v-if="sidebarLogo" :collapse="!appStore.sidebar.opened" />
       <el-scrollbar>
+        <!-- 侧边栏具体内容 -->
         <SidebarMenu :menu-list="permissionStore.routes" base-path="" />
       </el-scrollbar>
       <NavbarAction v-if="layout === LayoutEnum.TOP" />

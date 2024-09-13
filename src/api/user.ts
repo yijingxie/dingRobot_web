@@ -25,7 +25,7 @@ export interface UserInfo {
   token: string;
 
   /** 用户ID */
-  userId?: number;
+  userId?: string;
 
   /** 用户名 */
   username?: string;

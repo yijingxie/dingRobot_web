@@ -9,6 +9,7 @@ class MenuAPI {
    * @returns 路由列表
    */
   static getRoutes() {
+    console.log("后端返回用户的路由权限信息");
     // return request<any, RouteVO[]>({
     //   url: "/api/v1/menus/routes",
     //   method: "get",
