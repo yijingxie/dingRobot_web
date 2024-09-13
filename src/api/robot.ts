@@ -3,12 +3,9 @@ import { ValueOf } from "element-plus/es/components/table/src/table-column/defau
 
 class RobotAPI {
   // 机器人管理接口：获取当前所有的机器人信息
-  static getRobotList(queryParams: any) {
-    console.log("queryParams");
-    console.log(queryParams.page);
-    console.log(queryParams.pageSize);
+  static getRobotList(pageNow: number, pageSize: number) {
     return request<any, any>({
-      url: `/ding/robot/getRobotList?page=${queryParams.page}&pageSize=${queryParams.pageSize}&name=&is_shared=0`,
+      url: `/ding/robot/getRobotList?page=${pageNow}&pageSize=${pageSize}&name=&is_shared=0`,
       method: "get",
     });
   }
@@ -16,7 +13,7 @@ class RobotAPI {
 
 export default RobotAPI;
 
-// 请求参数的ts类型
+// 获取机器人接口参数的ts类型
 export interface queryData {
   // 当前页码
   page: number;
@@ -67,3 +64,6 @@ export interface ResponseRobotData {
   // 一页展示多少个数据
   pageSize: number;
 }
+
+// 添加机器人的参数的ts类型
+// export interface
