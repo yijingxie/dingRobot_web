@@ -16,6 +16,7 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from "vue";
 import { useAppStore, useSettingsStore } from "@/store";
 import defaultSettings from "@/settings";
 import { ThemeEnum } from "@/enums/ThemeEnum";
@@ -33,5 +34,12 @@ const fontColor = computed(() => {
   return settingsStore.theme === ThemeEnum.DARK
     ? "rgba(255, 255, 255, .15)"
     : "rgba(0, 0, 0, .15)";
+});
+
+onMounted(() => {
+  // 通知js修改根节点的样式对象的属性和属性值
+  const html = document.documentElement;
+  html.style.setProperty("--el-color-primary", "#4080FF");
+  html.style.setProperty("--el-color-success", "#23c343");
 });
 </script>

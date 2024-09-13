@@ -2,9 +2,25 @@
   <div class="robot">
     <el-scrollbar>
       <!-- 上方搜索区域 -->
-      <el-card style="margin-bottom: 10px">111</el-card>
+      <el-card style="margin-bottom: 15px">
+        <el-form :inline="true">
+          <el-form-item label="关键字">
+            <el-input
+              size="default"
+              placeholder="ID/机器人名称/所属人"
+              style="width: 300px"
+            />
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" icon="Search" color="">搜索</el-button>
+          </el-form-item>
+          <el-form-item>
+            <el-button icon="Refresh">重置</el-button>
+          </el-form-item>
+        </el-form>
+      </el-card>
       <!-- 下方添加、表格区域 -->
-      <el-card style="height: 3000px">
+      <el-card>
         <!-- 按钮：添加机器人 -->
         <el-button type="success" size="default" icon="Plus" @click="addRobot">
           新增
@@ -134,6 +150,14 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .robot {
-  padding: 10px;
+  padding: 20px;
+
+  .el-form {
+    margin-bottom: 0;
+
+    .el-form-item--default {
+      margin-bottom: 0;
+    }
+  }
 }
 </style>
