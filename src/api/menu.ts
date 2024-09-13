@@ -13,16 +13,128 @@ class MenuAPI {
     //   url: "/api/v1/menus/routes",
     //   method: "get",
     // });
+    // return {
+    //   code: "00000",
+    //   data: [
+    //     {
+    //       path: "/doc",
+    //       component: "Layout",
+    //       redirect: "https://juejin.cn/post/7228990409909108793",
+    //       name: "/doc",
+    //       meta: {
+    //         title: "平台文档",
+    //         icon: "document",
+    //         hidden: false,
+    //         alwaysShow: false,
+    //         params: null,
+    //       },
+    //       children: [
+    //         {
+    //           path: "internal-doc",
+    //           component: "demo/internal-doc",
+    //           name: "InternalDoc",
+    //           meta: {
+    //             title: "平台文档(内嵌)",
+    //             icon: "document",
+    //             hidden: false,
+    //             alwaysShow: false,
+    //             params: null,
+    //           },
+    //         },
+    //         {
+    //           path: "https://juejin.cn/post/7228990409909108793",
+    //           name: "Https://juejin.cn/post/7228990409909108793",
+    //           meta: {
+    //             title: "平台文档(外链)",
+    //             icon: "el-icon-Link",
+    //             hidden: false,
+    //             alwaysShow: false,
+    //             params: null,
+    //           },
+    //         },
+    //       ],
+    //     },
+    //     {
+    //       path: "/multi-level",
+    //       component: "Layout",
+    //       name: "/multiLevel",
+    //       meta: {
+    //         title: "多级菜单",
+    //         icon: "cascader",
+    //         hidden: false,
+    //         alwaysShow: true,
+    //         params: null,
+    //       },
+    //       children: [
+    //         {
+    //           path: "multi-level1",
+    //           component: "demo/multi-level/level1",
+    //           name: "MultiLevel1",
+    //           meta: {
+    //             title: "菜单一级",
+    //             icon: "",
+    //             hidden: false,
+    //             alwaysShow: true,
+    //             params: null,
+    //           },
+    //           children: [
+    //             {
+    //               path: "multi-level2",
+    //               component: "demo/multi-level/children/level2",
+    //               name: "MultiLevel2",
+    //               meta: {
+    //                 title: "菜单二级",
+    //                 icon: "",
+    //                 hidden: false,
+    //                 alwaysShow: false,
+    //                 params: null,
+    //               },
+    //               children: [
+    //                 {
+    //                   path: "multi-level3-1",
+    //                   component: "demo/multi-level/children/children/level3-1",
+    //                   name: "MultiLevel31",
+    //                   meta: {
+    //                     title: "菜单三级-1",
+    //                     icon: "",
+    //                     hidden: false,
+    //                     keepAlive: true,
+    //                     alwaysShow: false,
+    //                     params: null,
+    //                   },
+    //                 },
+    //                 {
+    //                   path: "multi-level3-2",
+    //                   component: "demo/multi-level/children/children/level3-2",
+    //                   name: "MultiLevel32",
+    //                   meta: {
+    //                     title: "菜单三级-2",
+    //                     icon: "",
+    //                     hidden: false,
+    //                     keepAlive: true,
+    //                     alwaysShow: false,
+    //                     params: null,
+    //                   },
+    //                 },
+    //               ],
+    //             },
+    //           ],
+    //         },
+    //       ],
+    //     },
+    //   ],
+    //   msg: "一切ok",
+    // };
     return {
       code: "00000",
       data: [
         {
-          path: "/doc",
+          path: "/robot",
           component: "Layout",
-          redirect: "https://juejin.cn/post/7228990409909108793",
-          name: "/doc",
+          redirect: "/robot/robotManage",
+          name: "Robot",
           meta: {
-            title: "平台文档",
+            title: "机器人管理",
             icon: "document",
             hidden: false,
             alwaysShow: false,
@@ -30,11 +142,11 @@ class MenuAPI {
           },
           children: [
             {
-              path: "internal-doc",
-              component: "demo/internal-doc",
-              name: "InternalDoc",
+              path: "/robot/robotManage",
+              component: "robot/robotManage/index",
+              name: "RobotManage",
               meta: {
-                title: "平台文档(内嵌)",
+                title: "机器人管理",
                 icon: "document",
                 hidden: false,
                 alwaysShow: false,
@@ -42,10 +154,11 @@ class MenuAPI {
               },
             },
             {
-              path: "https://juejin.cn/post/7228990409909108793",
-              name: "Https://juejin.cn/post/7228990409909108793",
+              path: "/robot/taskSchedule",
+              component: "robot/taskSchedule/index",
+              name: "TaskSchedule",
               meta: {
-                title: "平台文档(外链)",
+                title: "定时任务管理",
                 icon: "el-icon-Link",
                 hidden: false,
                 alwaysShow: false,
@@ -55,11 +168,12 @@ class MenuAPI {
           ],
         },
         {
-          path: "/multi-level",
+          path: "/resource",
           component: "Layout",
-          name: "/multiLevel",
+          redirect: "/resource/personResource",
+          name: "Resource",
           meta: {
-            title: "多级菜单",
+            title: "资源管理",
             icon: "cascader",
             hidden: false,
             alwaysShow: true,
@@ -67,58 +181,79 @@ class MenuAPI {
           },
           children: [
             {
-              path: "multi-level1",
-              component: "demo/multi-level/level1",
-              name: "MultiLevel1",
+              path: "/resource/personResource",
+              component: "resource/personResource/index",
+              name: "PersonResource",
               meta: {
-                title: "菜单一级",
+                title: "个人资源",
                 icon: "",
                 hidden: false,
-                alwaysShow: true,
+                alwaysShow: false,
                 params: null,
               },
-              children: [
-                {
-                  path: "multi-level2",
-                  component: "demo/multi-level/children/level2",
-                  name: "MultiLevel2",
-                  meta: {
-                    title: "菜单二级",
-                    icon: "",
-                    hidden: false,
-                    alwaysShow: false,
-                    params: null,
-                  },
-                  children: [
-                    {
-                      path: "multi-level3-1",
-                      component: "demo/multi-level/children/children/level3-1",
-                      name: "MultiLevel31",
-                      meta: {
-                        title: "菜单三级-1",
-                        icon: "",
-                        hidden: false,
-                        keepAlive: true,
-                        alwaysShow: false,
-                        params: null,
-                      },
-                    },
-                    {
-                      path: "multi-level3-2",
-                      component: "demo/multi-level/children/children/level3-2",
-                      name: "MultiLevel32",
-                      meta: {
-                        title: "菜单三级-2",
-                        icon: "",
-                        hidden: false,
-                        keepAlive: true,
-                        alwaysShow: false,
-                        params: null,
-                      },
-                    },
-                  ],
-                },
-              ],
+            },
+            {
+              path: "/resource/departmentResource",
+              component: "resource/departmentResource/index",
+              name: "DepartmentResource",
+              meta: {
+                title: "部门资源",
+                icon: "",
+                hidden: false,
+                alwaysShow: false,
+                params: null,
+              },
+            },
+            {
+              path: "/resource/publicResource",
+              component: "resource/publicResource/index",
+              name: "PublicResource",
+              meta: {
+                title: "公开资源",
+                icon: "",
+                hidden: false,
+                alwaysShow: false,
+                params: null,
+              },
+            },
+          ],
+        },
+        {
+          path: "/attendCheck",
+          component: "Layout",
+          redirect: "/attendCheck/departmentCheck",
+          name: "AttendCheck",
+          meta: {
+            title: "考勤组管理",
+            icon: "cascader",
+            hidden: false,
+            alwaysShow: true,
+            params: null,
+          },
+          children: [
+            {
+              path: "/attendCheck/departmentCheck",
+              component: "attendCheck/departmentCheck/index",
+              name: "DepartmentCheck",
+              meta: {
+                title: "部门考勤管理",
+                icon: "",
+                hidden: false,
+                alwaysShow: false,
+                params: null,
+              },
+            },
+            {
+              path: "/attendCheck/checkTeam",
+              component: "attendCheck/checkTeam/index",
+              name: "CheckTeam",
+              meta: {
+                title: "考勤组管理",
+                icon: "",
+                hidden: false,
+                alwaysShow: false,
+                params: null,
+              },
             },
           ],
         },
