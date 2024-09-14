@@ -20,14 +20,6 @@ class AuthAPI {
       method: "delete",
     });
   }
-
-  /** 获取验证码 接口*/
-  static getCaptcha() {
-    return request<any, CaptchaResult>({
-      url: "/api/v1/auth/captcha",
-      method: "get",
-    });
-  }
 }
 
 export default AuthAPI;

@@ -32,7 +32,6 @@ const minHeight = computed(() => {
 <style lang="scss" scoped>
 .app-main {
   position: relative;
-  // background-color: var(--el-bg-color-page);
-  background: var(--main-bg-color);
+  background-color: var(--el-bg-color-page);
 }
 </style>
