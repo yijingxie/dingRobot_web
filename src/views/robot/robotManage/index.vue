@@ -32,18 +32,30 @@
             新增
           </el-button>
           <!-- 按钮：批量删除机器人 -->
-          <el-button
-            type="danger"
-            icon="Delete"
-            :disabled="deleteRobotIdArr.robot_ids.length > 0 ? false : true"
-            @click="deleteRobots"
+          <el-popconfirm
+            title="你确定要批量删除机器人吗"
+            width="250px"
+            @confirm="deleteRobots"
           >
-            批量删除
-          </el-button>
+            <template #reference>
+              <el-button
+                type="danger"
+                icon="Delete"
+                :disabled="deleteRobotIdArr.robot_ids.length > 0 ? false : true"
+              >
+                批量删除
+              </el-button>
+            </template>
+          </el-popconfirm>
         </template>
 
         <!-- 表格 -->
-        <el-table border style="margin: 20px 0" :data="curRobots">
+        <el-table
+          border
+          style="margin: 20px 0"
+          :data="curRobots"
+          @selection-change="selectChange"
+        >
           <el-table-column type="selection" />
           <el-table-column
             label="序号"
@@ -196,6 +208,12 @@ function addRobot() {
     addRobotRef.value.clearValidate("name");
     addRobotRef.value.clearValidate("is_shared");
   });
+  // 清除上一次表单显示结果（点击编辑在表单留下的数据）
+  AddRobotData.value = {
+    robot_id: "",
+    name: "",
+    is_shared: 1,
+  };
 }
 
 // 添加|编辑机器人对话框的确认按钮
@@ -210,12 +228,6 @@ async function addRobotConfirm() {
         type: "success",
         message: "添加成功",
       });
-      // 清除上一次表单显示结果（点击编辑在表单留下的数据）
-      AddRobotData.value = {
-        robot_id: "",
-        name: "",
-        is_shared: 1,
-      };
       // 成功后再获取一次当前页面所有机器人的数据，获取添加后的最新数据
       getRobotList();
     })
@@ -247,7 +259,9 @@ function deleteRobot(robotId: string) {
         type: "success",
         message: "删除成功",
       });
-      getRobotList(curRobots.value.length >= 1 ? pageNow.value : 1);
+      getRobotList(
+        curRobots.value.length >= 1 ? pageNow.value : pageNow.value - 1
+      );
     })
     .catch((error) => {
       ElMessage({
@@ -259,7 +273,32 @@ function deleteRobot(robotId: string) {
 
 // 批量删除机器人
 function deleteRobots() {
-  console.log("批量删除");
+  RobotAPI.deleteRobot(deleteRobotIdArr)
+    .then((data) => {
+      ElMessage({
+        type: "success",
+        message: "批量删除成功",
+      });
+      getRobotList(
+        curRobots.value.length >= 1 ? pageNow.value : pageNow.value - 1
+      );
+    })
+    .catch((error) => {
+      ElMessage({
+        type: "error",
+        message: "批量删除失败",
+      });
+      console.log(error);
+    });
+}
+
+// table复选框勾选的时候会触发的事件
+function selectChange(value: any) {
+  // value: table会自动注入value，value即你选中的每一项数据
+  deleteRobotIdArr.robot_ids = value.map((item: Robot) => {
+    return item.robot_id;
+  });
+  console.log(deleteRobotIdArr.robot_ids);
 }
 
 // 分页器下拉框改变时触发,一改变就返回第一页
@@ -275,6 +314,7 @@ const validateRobot_Id = (rule: any, value: any, callback: any) => {
     callback(new Error("请输入正确的 id格式"));
   }
 };
+
 // name的检验规则
 const validateName = (rule: any, value: any, callback: any) => {
   if (value.length >= 2) {
@@ -283,6 +323,7 @@ const validateName = (rule: any, value: any, callback: any) => {
     callback(new Error("名称长度至少两位"));
   }
 };
+
 // 添加机器人的表单的校验
 const addRobotRules = reactive<FormRules<typeof AddRobotData>>({
   robot_id: [{ required: true, trigger: "blur", validator: validateRobot_Id }],
