@@ -9,7 +9,7 @@ class RobotAPI {
     });
   }
 
-  // 添加机器人接口
+  // 添加|修改机器人接口
   static addRobot(data: addRobotParameter) {
     return request<any, any>({
       url: "/ding/robot/addRobot",
@@ -17,6 +17,17 @@ class RobotAPI {
       data: data,
     });
   }
+
+  // 删除一个机器人
+  static deleteRobot(robot_ids: deleteRobotParamter) {
+    return request<any, any>({
+      url: "/ding/robot/removeRobot",
+      method: "delete",
+      data: robot_ids,
+    });
+  }
+
+  // 批量删除机器人
 }
 
 export default RobotAPI;
@@ -64,9 +75,14 @@ export interface ResponseRobotData {
   pageSize: number;
 }
 
-// 添加机器人的参数的ts类型
+// 添加|修改机器人的参数的ts类型
 export interface addRobotParameter {
   is_shared: number; // 是否共享
   name: string; // 机器人名字
   robot_id: string; // 机器人id
+}
+
+// 删除机器人请求携带参数的 ts类型
+export interface deleteRobotParamter {
+  robot_ids: string[];
 }

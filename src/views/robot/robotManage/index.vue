@@ -32,7 +32,12 @@
             新增
           </el-button>
           <!-- 按钮：批量删除机器人 -->
-          <el-button type="danger" size="default" icon="Delete">
+          <el-button
+            type="danger"
+            icon="Delete"
+            :disabled="deleteRobotIdArr.robot_ids.length > 0 ? false : true"
+            @click="deleteRobots"
+          >
             批量删除
           </el-button>
         </template>
@@ -57,9 +62,18 @@
           <el-table-column label="所属人" align="center" prop="user_name" />
           <el-table-column label="操作" align="center">
             <template #default="{ row }">
-              <el-button type="danger" size="small" icon="Delete">
-                删除
-              </el-button>
+              <el-popconfirm
+                :title="`你确定要删除${row.name}吗`"
+                width="250px"
+                @confirm="deleteRobot(row.robot_id)"
+              >
+                <template #reference>
+                  <el-button type="danger" size="small" icon="Delete">
+                    删除
+                  </el-button>
+                </template>
+              </el-popconfirm>
+
               <el-button
                 type="primary"
                 size="small"
@@ -127,6 +141,7 @@ import RobotAPI, {
   type RobotList,
   addRobotParameter,
   Robot,
+  deleteRobotParamter,
 } from "@/api/robot";
 // import
 import type { FormInstance, FormRules } from "element-plus";
@@ -151,6 +166,10 @@ let AddRobotData = ref<addRobotParameter>({
 });
 // 添加机器人表单实例
 let addRobotRef = ref();
+// 准备一个数组存储批量删除的用户的ID
+let deleteRobotIdArr = reactive<deleteRobotParamter>({
+  robot_ids: [],
+});
 
 // 获取当前页面机器人信息
 function getRobotList(page: number = 1) {
@@ -179,7 +198,7 @@ function addRobot() {
   });
 }
 
-// 添加机器人对话框的确认按钮
+// 添加|编辑机器人对话框的确认按钮
 async function addRobotConfirm() {
   // 表单校验全部通过，才能发请求
   await addRobotRef.value.validate();
@@ -217,6 +236,30 @@ function editRobot(row: Robot) {
   AddRobotData.value.robot_id = row.robot_id;
   AddRobotData.value.name = row.name;
   AddRobotData.value.is_shared = row.is_shared;
+}
+
+// 删除一个机器人
+function deleteRobot(robotId: string) {
+  deleteRobotIdArr.robot_ids.push(robotId);
+  RobotAPI.deleteRobot(deleteRobotIdArr)
+    .then((data) => {
+      ElMessage({
+        type: "success",
+        message: "删除成功",
+      });
+      getRobotList(curRobots.value.length >= 1 ? pageNow.value : 1);
+    })
+    .catch((error) => {
+      ElMessage({
+        type: "error",
+        message: "删除失败",
+      });
+    });
+}
+
+// 批量删除机器人
+function deleteRobots() {
+  console.log("批量删除");
 }
 
 // 分页器下拉框改变时触发,一改变就返回第一页
