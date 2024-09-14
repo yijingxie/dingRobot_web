@@ -7,7 +7,7 @@
           <el-form-item label="关键字">
             <el-input
               size="default"
-              placeholder="ID/机器人名称/所属人"
+              placeholder="ID / 机器人名称 / 所属人"
               style="width: 300px"
             />
           </el-form-item>
@@ -94,7 +94,9 @@
               >
                 修改
               </el-button>
-              <el-button size="small" icon="Plus">添加任务</el-button>
+              <el-button size="small" icon="Plus" @click="addTask(row)">
+                添加任务
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -116,7 +118,11 @@
       </el-card>
     </el-scrollbar>
     <!-- 对话框：添加与修改机器人 -->
-    <el-dialog title="添加机器人" width="500" v-model="robotVisible">
+    <el-dialog
+      :title="robotInputVisible ? '修改机器人' : '添加机器人'"
+      width="500"
+      v-model="robotVisible"
+    >
       <!-- 表单 -->
       <el-form :model="AddRobotData" :rules="addRobotRules" ref="addRobotRef">
         <el-form-item label="机器人ID" label-width="100px" prop="robot_id">
@@ -143,6 +149,67 @@
         </div>
       </template>
     </el-dialog>
+    <!-- 抽屉：给机器人添加任务 -->
+    <el-drawer v-model="isDrawer">
+      <!-- 抽屉头部 -->
+      <template #header>
+        <p style="font-size: 18px">添加任务</p>
+      </template>
+      <!-- 抽屉身体 -->
+      <template #default>
+        <el-form>
+          <!-- 任务名换 -->
+          <el-form-item>
+            <p>任务名称</p>
+            <el-input style="width: 420px" />
+          </el-form-item>
+          <!-- 重复时间类型 -->
+          <el-form-item>
+            <div>
+              <p>重复时间类型</p>
+              <el-select
+                placeholder="Select"
+                style="width: 420px"
+                size="default"
+              >
+                <!-- <el-option /> -->
+              </el-select>
+            </div>
+          </el-form-item>
+          <!-- 是否全体通知 -->
+          <el-form-item>
+            <div>
+              <p>是否全体通知</p>
+              <el-radio-group>
+                <el-radio value="1" size="large">是</el-radio>
+                <el-radio value="2" size="large">否</el-radio>
+              </el-radio-group>
+            </div>
+          </el-form-item>
+          <!-- 通知内容 -->
+          <el-form-item>
+            <div>
+              <p>通知内容</p>
+              <el-input
+                maxlength="30"
+                style="width: 420px"
+                minlength="300px"
+                placeholder="请输入通知内容~"
+                show-word-limit
+                type="textarea"
+              />
+            </div>
+          </el-form-item>
+        </el-form>
+      </template>
+      <!-- 抽屉底部 -->
+      <template #footer>
+        <div style="flex: auto">
+          <el-button @click="isDrawer = false">取消</el-button>
+          <el-button type="primary">确认</el-button>
+        </div>
+      </template>
+    </el-drawer>
   </div>
 </template>
 
@@ -182,6 +249,8 @@ let addRobotRef = ref();
 let deleteRobotIdArr = reactive<deleteRobotParamter>({
   robot_ids: [],
 });
+// 控制分配任务的抽屉的显示与隐藏
+let isDrawer = ref<boolean>(false);
 
 // 获取当前页面机器人信息
 function getRobotList(page: number = 1) {
@@ -226,7 +295,7 @@ async function addRobotConfirm() {
       robotVisible.value = false;
       ElMessage({
         type: "success",
-        message: "添加成功",
+        message: robotInputVisible.value ? "修改成功" : "添加成功",
       });
       // 成功后再获取一次当前页面所有机器人的数据，获取添加后的最新数据
       getRobotList();
@@ -234,7 +303,7 @@ async function addRobotConfirm() {
     .catch((error) => {
       ElMessage({
         type: "error",
-        message: "添加失败",
+        message: robotInputVisible.value ? "修改失败" : "添加失败",
       });
       console.log(error);
     });
@@ -330,6 +399,14 @@ const addRobotRules = reactive<FormRules<typeof AddRobotData>>({
   name: [{ required: true, trigger: "blur", validator: validateName }],
 });
 
+// 添加任务按钮
+function addTask(row: Robot) {
+  console.log("抽屉");
+  console.log(row);
+  // 打开抽屉
+  isDrawer.value = true;
+}
+
 // 组件一挂载就发请求获取机器人信息
 onMounted(() => {
   getRobotList();
@@ -349,5 +426,14 @@ onMounted(() => {
       }
     }
   }
+
+  .el-drawer__header {
+    margin-bottom: 0;
+  }
+}
+
+p {
+  padding: 0;
+  margin: 0;
 }
 </style>

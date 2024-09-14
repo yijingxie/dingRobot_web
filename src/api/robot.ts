@@ -18,7 +18,7 @@ class RobotAPI {
     });
   }
 
-  // 删除一个机器人
+  // 删除 | 批量删除机器人
   static deleteRobot(robot_ids: deleteRobotParamter) {
     return request<any, any>({
       url: "/ding/robot/removeRobot",
@@ -27,7 +27,14 @@ class RobotAPI {
     });
   }
 
-  // 批量删除机器人
+  // 添加任务
+  static addTask(addTaskForm: any) {
+    return request<any, any>({
+      url: "/ding/cronTask/addTask",
+      method: "post",
+      data: addTaskForm,
+    });
+  }
 }
 
 export default RobotAPI;
@@ -84,5 +91,20 @@ export interface addRobotParameter {
 
 // 删除机器人请求携带参数的 ts类型
 export interface deleteRobotParamter {
+  // 机器人id
   robot_ids: string[];
+}
+
+export interface msg_textParamter {
+  at: string;
+  text: string;
+  msgtype: string;
+}
+
+// 添加任务请求携带的参数的 ts类型
+export interface addTaskFormParamter {
+  robot_id: string; // 机器人id
+  task_name: string; // 任务名称
+  repeat_time: string; // 重复时间
+  msg_text: string; // 其他内容
 }

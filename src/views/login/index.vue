@@ -1,99 +1,116 @@
 <template>
   <div class="login-container">
-    <!-- 顶部工具栏 -->
-    <div class="top-bar">
-      <el-switch
-        v-model="isDark"
-        inline-prompt
-        active-icon="Moon"
-        inactive-icon="Sunny"
-        @change="toggleTheme"
-      />
-      <lang-select class="ml-2 cursor-pointer" />
-    </div>
-    <!-- 登录表单 -->
-    <el-card class="login-card">
-      <div class="text-center relative">
-        <h2>{{ defaultSettings.title }}</h2>
-        <el-tag class="ml-2 absolute-rt">{{ defaultSettings.version }}</el-tag>
+    <!-- 账号密码登录 -->
+    <div class="password" v-if="!scanCode">
+      <!-- 顶部工具栏 -->
+      <div class="top-bar">
+        <el-switch
+          v-model="isDark"
+          inline-prompt
+          active-icon="Moon"
+          inactive-icon="Sunny"
+          @change="toggleTheme"
+        />
+        <lang-select class="ml-2 cursor-pointer" />
       </div>
+      <!-- 登录表单 -->
+      <el-card class="login-card">
+        <!-- 标题 -->
+        <div class="text-center relative">
+          <h2>{{ defaultSettings.title }}</h2>
+          <el-tag class="ml-2 absolute-rt">
+            {{ defaultSettings.version }}
+          </el-tag>
+        </div>
 
-      <el-form
-        ref="loginFormRef"
-        :model="loginData"
-        :rules="loginRules"
-        class="login-form"
-      >
-        <!--  手机号 -->
-        <el-form-item prop="mobile">
-          <div class="input-wrapper">
-            <i-ep-user class="mx-2" />
-            <el-input
-              ref="mobile"
-              v-model="loginData.mobile"
-              :placeholder="$t('login.mobile')"
-              name="mobile"
-              size="large"
-              class="h-[48px]"
-            />
-          </div>
-        </el-form-item>
-
-        <!-- 密码 -->
-        <el-tooltip
-          :visible="isCapslock"
-          :content="$t('login.capsLock')"
-          placement="right"
+        <el-form
+          ref="loginFormRef"
+          :model="loginData"
+          :rules="loginRules"
+          class="login-form"
         >
-          <el-form-item prop="password">
+          <!--  手机号 -->
+          <el-form-item prop="mobile">
             <div class="input-wrapper">
-              <i-ep-lock class="mx-2" />
+              <i-ep-user class="mx-2" />
               <el-input
-                v-model="loginData.password"
-                :placeholder="$t('login.password')"
-                type="password"
-                name="password"
-                @keyup="checkCapslock"
-                @keyup.enter="handleLoginSubmit"
+                ref="mobile"
+                v-model="loginData.mobile"
+                :placeholder="$t('login.mobile')"
+                name="mobile"
                 size="large"
-                class="h-[48px] pr-2"
-                show-password
+                class="h-[48px]"
               />
             </div>
           </el-form-item>
-        </el-tooltip>
 
-        <!-- 登录按钮 -->
-        <el-button
-          :loading="loading"
-          type="primary"
-          size="large"
-          class="w-full"
-          @click.prevent="handleLoginSubmit"
+          <!-- 密码 -->
+          <el-tooltip
+            :visible="isCapslock"
+            :content="$t('login.capsLock')"
+            placement="right"
+          >
+            <el-form-item prop="password">
+              <div class="input-wrapper">
+                <i-ep-lock class="mx-2" />
+                <el-input
+                  v-model="loginData.password"
+                  :placeholder="$t('login.password')"
+                  type="password"
+                  name="password"
+                  @keyup="checkCapslock"
+                  @keyup.enter="handleLoginSubmit"
+                  size="large"
+                  class="h-[48px] pr-2"
+                  show-password
+                />
+              </div>
+            </el-form-item>
+          </el-tooltip>
+
+          <!-- 登录按钮 -->
+          <el-button
+            :loading="loading"
+            type="primary"
+            size="large"
+            class="w-full"
+            @click.prevent="handleLoginSubmit"
+          >
+            {{ $t("login.login") }}
+          </el-button>
+
+          <h4>&nbsp;</h4>
+        </el-form>
+        <a
+          style=" color: #3579ec;text-decoration: none"
+          id="redirectButton"
+          @click="toggle"
         >
-          {{ $t("login.login") }}
-        </el-button>
+          切换为扫码登录
+        </a>
+      </el-card>
 
-        <!-- 账号密码提示 -->
-        <div class="mt-10 text-sm">
-          <span>{{ $t("login.mobile") }}: 18737480171</span>
-          <span class="ml-4">{{ $t("login.password") }}: 123456</span>
-        </div>
-      </el-form>
-    </el-card>
-
-    <!-- ICP备案 -->
-    <div class="icp-info" v-show="icpVisible">
-      <p>
-        Copyright © 2021 - 2024 youlai.tech All Rights Reserved. 有来技术
-        版权所有
-      </p>
-      <p>皖ICP备20006496号-3</p>
+      <!-- ICP备案 -->
+      <div class="icp-info" v-show="icpVisible">
+        <p>
+          Copyright © 2021 - 2024 youlai.tech All Rights Reserved. 有来技术
+          版权所有
+        </p>
+        <p>皖ICP备20006496号-3</p>
+      </div>
+    </div>
+    <!-- 扫码登录 -->
+    <div class="scan" v-else>
+      <div class="saomaHeader">
+        <img src="../../assets//images/dingding.png" alt="钉钉扫码登录" />
+        <p class="saomaTitle">正在加载中，请稍后~</p>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { onMounted } from "vue";
 // 外部库和依赖
 import { LocationQuery, useRoute } from "vue-router";
 
@@ -103,6 +120,7 @@ import AuthAPI, { type LoginData } from "@/api/auth";
 import router from "@/router";
 import defaultSettings from "@/settings";
 import { ThemeEnum } from "@/enums/ThemeEnum";
+import { TOKEN_KEY } from "@/enums/CacheEnum";
 
 // 类型定义
 import type { FormInstance } from "element-plus";
@@ -119,6 +137,8 @@ const { height } = useWindowSize();
 // 国际化 Internationalization
 const { t } = useI18n();
 
+// 控制扫码登录切换
+let scanCode = ref<boolean>(false);
 // 是否暗黑模式
 const isDark = ref(settingsStore.theme === ThemeEnum.DARK);
 // 是否显示 ICP 备案信息
@@ -223,6 +243,53 @@ function checkCapslock(event: KeyboardEvent) {
     isCapslock.value = event.getModifierState("CapsLock");
   }
 }
+
+// 获取重定向的地址
+function redirectToDingTalk() {
+  const redirectUrl =
+    "https://login.dingtalk.com/oauth2/challenge.htm?redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2F%23%2F&response_type=code&client_id=dinglyjekzn80ebnlyge&scope=openid&state=dddd&prompt=consent";
+  window.location.href = redirectUrl;
+}
+
+// 切换为扫码登录
+function toggle() {
+  // 密码登录页面隐藏，扫码登录页面显示
+  scanCode.value = !scanCode.value;
+  // 获取重定向的地址
+  redirectToDingTalk();
+}
+
+// 获取地址栏参数
+function getUrlParam(name: any) {
+  const temp = window.location.href.split("?")[1];
+  const parm = new URLSearchParams("?" + temp);
+  return parm.get(name);
+}
+
+// 扫码登录
+// function scanLogin() {
+//   // 获取地址栏参数
+//   let authCode = getUrlParam("authCode");
+//   console.log(authCode);
+//   // if (authCode) {
+//   //   // 调用跳转接口
+//   //   AuthAPI.reqRedirect(authCode).then((res) => {
+//   //     if (res.code == 0) {
+//   //       console.log("res", "扫码登录");
+//   //       localStorage.setItem("authCode", authCode);
+//   //       localStorage.setItem("name", res.data.name);
+//   //       localStorage.setItem(TOKEN_KEY, res.data.auth_token);
+//   //       router.push("/");
+//   //     } else {
+//   //       window.location.href = "/login";
+//   //     }
+//   //   });
+//   // }
+// }
+
+onMounted(() => {
+  // scanLogin();
+});
 </script>
 
 <style lang="scss" scoped></style>
