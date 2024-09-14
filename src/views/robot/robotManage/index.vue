@@ -56,9 +56,20 @@
           <el-table-column label="机器人名称" align="center" prop="name" />
           <el-table-column label="所属人" align="center" prop="user_name" />
           <el-table-column label="操作" align="center">
-            <el-button type="danger" size="small" icon="Delete">删除</el-button>
-            <el-button type="primary" size="small" icon="Edit">修改</el-button>
-            <el-button size="small" icon="Plus">添加任务</el-button>
+            <template #default="{ row }">
+              <el-button type="danger" size="small" icon="Delete">
+                删除
+              </el-button>
+              <el-button
+                type="primary"
+                size="small"
+                icon="Edit"
+                @click="editRobot(row)"
+              >
+                修改
+              </el-button>
+              <el-button size="small" icon="Plus">添加任务</el-button>
+            </template>
           </el-table-column>
         </el-table>
         <!-- 分页器 -->
@@ -79,11 +90,14 @@
       </el-card>
     </el-scrollbar>
     <!-- 对话框：添加与修改机器人 -->
-    <el-dialog title="添加机器人" width="500" v-model="isAddRobot">
+    <el-dialog title="添加机器人" width="500" v-model="robotVisible">
       <!-- 表单 -->
       <el-form :model="AddRobotData" :rules="addRobotRules" ref="addRobotRef">
         <el-form-item label="机器人ID" label-width="100px" prop="robot_id">
-          <el-input v-model="AddRobotData.robot_id" />
+          <el-input
+            v-model="AddRobotData.robot_id"
+            :disabled="robotInputVisible"
+          />
         </el-form-item>
         <el-form-item label="机器人名称" label-width="100px" prop="name">
           <el-input v-model="AddRobotData.name" />
@@ -98,7 +112,7 @@
       <!-- 底部取消与确认按钮 -->
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="isAddRobot = false">取消</el-button>
+          <el-button @click="robotVisible = false">取消</el-button>
           <el-button type="primary" @click="addRobotConfirm">确认</el-button>
         </div>
       </template>
@@ -109,7 +123,11 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, nextTick } from "vue";
 // 引入接口，和ts类型
-import RobotAPI, { type RobotList, addRobotParameter } from "@/api/robot";
+import RobotAPI, {
+  type RobotList,
+  addRobotParameter,
+  Robot,
+} from "@/api/robot";
 // import
 import type { FormInstance, FormRules } from "element-plus";
 
@@ -122,7 +140,9 @@ let total = ref<number>(0);
 // 当前页面的所有机器人数据
 let curRobots = ref<RobotList>([]);
 // 控制添加机器人对话框的显示与隐藏
-let isAddRobot = ref<boolean>(false);
+let robotVisible = ref<boolean>(false);
+// 控制添加机器人对话框里的ID输入框是否禁用：false不禁用  true禁用
+let robotInputVisible = ref<boolean>(false);
 // 获取添加机器人的表单数据
 let AddRobotData = ref<addRobotParameter>({
   robot_id: "",
@@ -139,7 +159,6 @@ function getRobotList(page: number = 1) {
     .then((data) => {
       curRobots.value = data.list;
       total.value = data.total;
-      console.log("aaaa");
     })
     .catch((error) => {
       console.log(error);
@@ -147,16 +166,18 @@ function getRobotList(page: number = 1) {
 }
 
 // 添加机器人按钮
-const addRobot = () => {
+function addRobot() {
   // 显示对话框
-  isAddRobot.value = true;
+  robotVisible.value = true;
+  // id输入框可用
+  robotInputVisible.value = false;
   // 清除上一次的表单校验结果
   nextTick(() => {
     addRobotRef.value.clearValidate("robot_id");
     addRobotRef.value.clearValidate("name");
     addRobotRef.value.clearValidate("is_shared");
   });
-};
+}
 
 // 添加机器人对话框的确认按钮
 async function addRobotConfirm() {
@@ -165,17 +186,37 @@ async function addRobotConfirm() {
   // 发起添加机器人请求
   RobotAPI.addRobot(AddRobotData.value)
     .then((data) => {
-      isAddRobot.value = false;
+      robotVisible.value = false;
       ElMessage({
         type: "success",
         message: "添加成功",
       });
+      // 清除上一次表单显示结果（点击编辑在表单留下的数据）
+      AddRobotData.value = {
+        robot_id: "",
+        name: "",
+        is_shared: 1,
+      };
       // 成功后再获取一次当前页面所有机器人的数据，获取添加后的最新数据
       getRobotList();
     })
     .catch((error) => {
+      ElMessage({
+        type: "error",
+        message: "添加失败",
+      });
       console.log(error);
     });
+}
+
+// 编辑机器人按钮
+function editRobot(row: Robot) {
+  robotVisible.value = true;
+  // ID输入框禁用
+  robotInputVisible.value = true;
+  AddRobotData.value.robot_id = row.robot_id;
+  AddRobotData.value.name = row.name;
+  AddRobotData.value.is_shared = row.is_shared;
 }
 
 // 分页器下拉框改变时触发,一改变就返回第一页
