@@ -158,32 +158,88 @@
       <!-- 抽屉身体 -->
       <template #default>
         <el-form>
-          <!-- 任务名换 -->
+          <!-- 任务名称 -->
           <el-form-item>
             <p>任务名称</p>
-            <el-input style="width: 420px" />
+            <el-input v-model="TaskForm.task_name" style="width: 420px" />
           </el-form-item>
           <!-- 重复时间类型 -->
           <el-form-item>
             <div>
               <p>重复时间类型</p>
               <el-select
+                v-model="TaskForm.repeat_time"
                 placeholder="Select"
                 style="width: 420px"
                 size="default"
               >
-                <!-- <el-option /> -->
+                <el-option
+                  v-for="item in TaskFormOption"
+                  :key="item.value"
+                  :label="item.lable"
+                  :value="item.value"
+                />
               </el-select>
+            </div>
+          </el-form-item>
+          <!-- 仅发送一次 -->
+          <el-form-item v-if="TaskForm.repeat_time == '仅发送一次'">
+            <div>
+              <p>可选时间框</p>
+              <el-date-picker
+                v-model="value1"
+                type="datetime"
+                placeholder="Pick a Date"
+                format="YYYY-MM-DD HH:mm:ss"
+                date-format="MMM DD, YYYY"
+                time-format="HH:mm"
+              />
+            </div>
+          </el-form-item>
+          <!-- 周重复 -->
+          <el-form-item v-if="TaskForm.repeat_time == '周重复'">
+            <!-- 周几发送 -->
+            <div>
+              <p>请选择周几发送</p>
+              <el-checkbox v-model="checked1" label="周日" size="large" />
+              <el-checkbox v-model="checked2" label="周一" size="large" />
+              <el-checkbox v-model="checked2" label="周二" size="large" />
+              <el-checkbox v-model="checked2" label="周三" size="large" />
+              <el-checkbox v-model="checked2" label="周四" size="large" />
+              <el-checkbox v-model="checked2" label="周五" size="large" />
+              <el-checkbox v-model="checked2" label="周六" size="large" />
+            </div>
+            <!-- 具体时间 -->
+            <div>
+              <el-time-picker
+                v-model="value2"
+                arrow-control
+                placeholder="Arbitrary time"
+              />
+            </div>
+          </el-form-item>
+          <!-- spec -->
+          <el-form-item v-if="TaskForm.repeat_time == 'spec'">
+            <div>
+              <p>spec(详情参考https://github.com/robfig/cron)</p>
+              <el-input />
             </div>
           </el-form-item>
           <!-- 是否全体通知 -->
           <el-form-item>
             <div>
               <p>是否全体通知</p>
-              <el-radio-group>
-                <el-radio value="1" size="large">是</el-radio>
-                <el-radio value="2" size="large">否</el-radio>
+              <el-radio-group v-model="TaskForm.msg_text.at.isAtAll">
+                <el-radio :value="true" size="large">是</el-radio>
+                <el-radio :value="false" size="large">否</el-radio>
               </el-radio-group>
+            </div>
+          </el-form-item>
+          <!-- 通知人员姓名 -->
+          <el-form-item v-if="!TaskForm.msg_text.at.isAtAll">
+            <div>
+              <p>通知人员姓名</p>
+              <el-input style="width: 420px" />
             </div>
           </el-form-item>
           <!-- 通知内容 -->
@@ -221,6 +277,7 @@ import RobotAPI, {
   addRobotParameter,
   Robot,
   deleteRobotParamter,
+  addTaskFormParamter,
 } from "@/api/robot";
 // import
 import type { FormInstance, FormRules } from "element-plus";
@@ -251,6 +308,38 @@ let deleteRobotIdArr = reactive<deleteRobotParamter>({
 });
 // 控制分配任务的抽屉的显示与隐藏
 let isDrawer = ref<boolean>(false);
+
+// 收集添加任务的表单数据
+let TaskForm = reactive<addTaskFormParamter>({
+  robot_id: "", // 机器人ID
+  task_name: "", // 任务名称
+  repeat_time: "", // 重复时间类型
+  detail_time: "", // 具体时间
+  msg_text: {
+    at: {
+      atMobiles: [
+        {
+          atMobile: "", // 通知人员手机号
+          name: "", // 通知人员姓名
+        },
+      ],
+      isAtAll: false, // 是否全体通知
+    },
+    text: {
+      content: "", // 通知内容
+    },
+    msgtype: "text", // 通知类型
+  },
+  spec: "",
+});
+
+// 添加任务表单中重复时间类型的选项
+let TaskFormOption = reactive([
+  { lable: "立即发送", value: "立即发送" },
+  { lable: "仅发送一次", value: "仅发送一次" },
+  { lable: "周重复", value: "周重复" },
+  { lable: "spec", value: "spec" },
+]);
 
 // 获取当前页面机器人信息
 function getRobotList(page: number = 1) {

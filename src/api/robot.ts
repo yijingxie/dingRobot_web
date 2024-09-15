@@ -35,6 +35,14 @@ class RobotAPI {
       data: addTaskForm,
     });
   }
+
+  // 获取通知人员姓名  模糊查询
+  static getPersonName(name: string) {
+    return request<any, any>({
+      url: `/ding/user/robot@user?name=${name}`,
+      method: "get",
+    });
+  }
 }
 
 export default RobotAPI;
@@ -95,16 +103,45 @@ export interface deleteRobotParamter {
   robot_ids: string[];
 }
 
+// msg_text的参数类型
 export interface msg_textParamter {
-  at: string;
-  text: string;
-  msgtype: string;
+  // 是否全体通知
+  //  是  →  不添加通知人信息（姓名 + 手机号）
+  //  否  →  添加通知人信息
+  at: {
+    // 通知人员信息
+    atMobiles: [
+      {
+        atMobile: string; // 通知人员手机号
+        name: string; // 通知人员姓名
+      },
+    ];
+    isAtAll: boolean; // 是否全体通知
+  };
+  text: {
+    content: string; // 通知的内容
+  };
+  msgtype: string; // 通知的类型
 }
 
 // 添加任务请求携带的参数的 ts类型
 export interface addTaskFormParamter {
   robot_id: string; // 机器人id
   task_name: string; // 任务名称
-  repeat_time: string; // 重复时间
-  msg_text: string; // 其他内容
+  repeat_time: string; // 重复时间类型
+  detail_time: string; // 具体时间信息
+  spec: string; // 不知道是啥
+  msg_text: msg_textParamter; // 其他内容
 }
+// 添加任务请求携带的参数总结
+// 机器人id
+// 任务名称
+// 重复时间类型
+//  --立即发送  获取点击确定按钮的时间
+//  --仅发送一次  发送时间
+//  --周重复  发送时间=周几+当天发送时间
+//  --spec  spec
+// 是否全体通知
+// --全体通知  不加通知人姓名
+// --不全体通知  加通知人姓名
+// 通知的内容

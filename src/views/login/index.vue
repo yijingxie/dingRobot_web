@@ -82,7 +82,7 @@
           <h4>&nbsp;</h4>
         </el-form>
         <a
-          style=" color: #3579ec;text-decoration: none"
+          style="color: #3579ec; text-decoration: none"
           id="redirectButton"
           @click="toggle"
         >
@@ -157,6 +157,7 @@ const loginData = ref<LoginData>({
   password: "123456",
 });
 
+// 表单校验规则
 const loginRules = computed(() => {
   return {
     mobile: [
@@ -291,5 +292,4 @@ onMounted(() => {
   // scanLogin();
 });
 </script>
-
 <style lang="scss" scoped></style>
