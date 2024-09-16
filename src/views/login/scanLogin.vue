@@ -28,17 +28,21 @@ function scanLogin() {
   console.log(authCode);
   if (authCode) {
     // 调用跳转接口
-    AuthAPI.reqRedirect(authCode).then((res) => {
-      if (res.code == 0) {
-        console.log("res", "扫码登录");
+    AuthAPI.reqRedirect(authCode)
+      .then((res) => {
         localStorage.setItem("authCode", authCode);
-        localStorage.setItem("username", res.data.username);
-        localStorage.setItem(TOKEN_KEY, res.data.auth_token);
+        localStorage.setItem("username", res.name);
+        localStorage.setItem(TOKEN_KEY, res.auth_token);
         router.push("/home");
-      } else {
-        window.location.href = "http://localhost:3000/#/";
-      }
-    });
+      })
+      .catch((error) => {
+        ElMessage({
+          type: "error",
+          message: "扫码登录失败",
+        });
+        console.log(error);
+        router.push("/login");
+      });
   }
 }
 
