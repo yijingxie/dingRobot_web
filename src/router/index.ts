@@ -23,6 +23,16 @@ export const constantRoutes: RouteRecordRaw[] = [
     meta: { hidden: true },
   },
 
+  // 扫码登录缓冲页（扫码登录后在这个页面获取authCode）
+  {
+    path: "/scanLogin",
+    component: () => import("@/views/login/scanLogin.vue"),
+    name: "scanLogin",
+    meta: {
+      hidden: true,
+    },
+  },
+
   {
     path: "/",
     name: "/",

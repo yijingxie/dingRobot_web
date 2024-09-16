@@ -193,7 +193,10 @@ function handleLoginSubmit() {
           router.push("/");
         })
         .catch((error) => {
-          console.log(error);
+          ElMessage({
+            type: "error",
+            message: "账号或密码错误",
+          });
         })
         .finally(() => {
           loading.value = false;
@@ -250,6 +253,7 @@ function redirectToDingTalk() {
   const redirectUrl =
     "https://login.dingtalk.com/oauth2/challenge.htm?redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2F%23%2F&response_type=code&client_id=dinglyjekzn80ebnlyge&scope=openid&state=dddd&prompt=consent";
   window.location.href = redirectUrl;
+  // router.push("/scanLogin");
 }
 
 // 切换为扫码登录
@@ -259,37 +263,5 @@ function toggle() {
   // 获取重定向的地址
   redirectToDingTalk();
 }
-
-// 获取地址栏参数
-function getUrlParam(name: any) {
-  const temp = window.location.href.split("?")[1];
-  const parm = new URLSearchParams("?" + temp);
-  return parm.get(name);
-}
-
-// 扫码登录
-// function scanLogin() {
-//   // 获取地址栏参数
-//   let authCode = getUrlParam("authCode");
-//   console.log(authCode);
-//   // if (authCode) {
-//   //   // 调用跳转接口
-//   //   AuthAPI.reqRedirect(authCode).then((res) => {
-//   //     if (res.code == 0) {
-//   //       console.log("res", "扫码登录");
-//   //       localStorage.setItem("authCode", authCode);
-//   //       localStorage.setItem("name", res.data.name);
-//   //       localStorage.setItem(TOKEN_KEY, res.data.auth_token);
-//   //       router.push("/");
-//   //     } else {
-//   //       window.location.href = "/login";
-//   //     }
-//   //   });
-//   // }
-// }
-
-onMounted(() => {
-  // scanLogin();
-});
 </script>
 <style lang="scss" scoped></style>

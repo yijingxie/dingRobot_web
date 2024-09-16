@@ -8,8 +8,8 @@ const { pkg } = __APP_INFO__;
 const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
 
 const defaultSettings: AppSettings = {
-  // title: pkg.name,
-  title: "钉钉机器人",
+  title: pkg.name,
+  // title: "钉钉机器人",
   version: pkg.version,
   showSettings: true,
   tagsView: true,

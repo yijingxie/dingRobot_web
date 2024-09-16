@@ -172,13 +172,12 @@
                 placeholder="Select"
                 style="width: 420px"
                 size="default"
+                @change="repeatTimeChange"
               >
-                <el-option
-                  v-for="item in TaskFormOption"
-                  :key="item.value"
-                  :label="item.lable"
-                  :value="item.value"
-                />
+                <el-option value="立即发送" label="立即发送" />
+                <el-option value="仅发送一次" label="仅发送一次" />
+                <el-option value="周重复" label="周重复" />
+                <el-option value="spec" label="spec" />
               </el-select>
             </div>
           </el-form-item>
@@ -187,12 +186,10 @@
             <div>
               <p>可选时间框</p>
               <el-date-picker
-                v-model="value1"
+                v-model="TaskForm.detail_time"
+                value-format="YYYY-MM-DD HH:mm:ss"
                 type="datetime"
-                placeholder="Pick a Date"
-                format="YYYY-MM-DD HH:mm:ss"
-                date-format="MMM DD, YYYY"
-                time-format="HH:mm"
+                placeholder="Select date and time"
               />
             </div>
           </el-form-item>
@@ -201,20 +198,24 @@
             <!-- 周几发送 -->
             <div>
               <p>请选择周几发送</p>
-              <el-checkbox v-model="checked1" label="周日" size="large" />
-              <el-checkbox v-model="checked2" label="周一" size="large" />
-              <el-checkbox v-model="checked2" label="周二" size="large" />
-              <el-checkbox v-model="checked2" label="周三" size="large" />
-              <el-checkbox v-model="checked2" label="周四" size="large" />
-              <el-checkbox v-model="checked2" label="周五" size="large" />
-              <el-checkbox v-model="checked2" label="周六" size="large" />
+              <el-checkbox-group v-model="weekList">
+                <el-checkbox label="周日" :value="0" />
+                <el-checkbox label="周一" :value="1" />
+                <el-checkbox label="周二" :value="2" />
+                <el-checkbox label="周三" :value="3" />
+                <el-checkbox label="周四" :value="4" />
+                <el-checkbox label="周五" :value="5" />
+                <el-checkbox label="周六" :value="6" />
+              </el-checkbox-group>
             </div>
             <!-- 具体时间 -->
             <div>
+              <p>具体时间</p>
               <el-time-picker
-                v-model="value2"
+                v-model="TaskForm.detail_time"
                 arrow-control
                 placeholder="Arbitrary time"
+                value-format="HH:mm:ss"
               />
             </div>
           </el-form-item>
@@ -222,14 +223,17 @@
           <el-form-item v-if="TaskForm.repeat_time == 'spec'">
             <div>
               <p>spec(详情参考https://github.com/robfig/cron)</p>
-              <el-input />
+              <el-input v-model="TaskForm.spec" />
             </div>
           </el-form-item>
           <!-- 是否全体通知 -->
           <el-form-item>
             <div>
               <p>是否全体通知</p>
-              <el-radio-group v-model="TaskForm.msg_text.at.isAtAll">
+              <el-radio-group
+                v-model="TaskForm.msg_text.at.isAtAll"
+                @change="allNoticeChange"
+              >
                 <el-radio :value="true" size="large">是</el-radio>
                 <el-radio :value="false" size="large">否</el-radio>
               </el-radio-group>
@@ -239,7 +243,28 @@
           <el-form-item v-if="!TaskForm.msg_text.at.isAtAll">
             <div>
               <p>通知人员姓名</p>
-              <el-input style="width: 420px" />
+              <el-select
+                v-model="TaskForm.msg_text.at.atMobiles[0].name"
+                filterable
+                remote
+                reserve-keyword
+                placeholder="请输入姓名"
+                :remote-method="remoteMethod"
+                :loading="loading"
+                style="width: 420px"
+                @change="nameChange"
+              >
+                <el-option
+                  v-for="item in nameList"
+                  :key="item.userid"
+                  :label="item.name"
+                  :value="item.name"
+                />
+              </el-select>
+              <!-- <el-input
+                v-model="TaskForm.msg_text.at.atMobiles[0].name"
+                style="width: 420px"
+              /> -->
             </div>
           </el-form-item>
           <!-- 通知内容 -->
@@ -247,11 +272,12 @@
             <div>
               <p>通知内容</p>
               <el-input
-                maxlength="30"
+                v-model="TaskForm.msg_text.text.content"
+                maxlength="2000"
                 style="width: 420px"
-                minlength="300px"
                 placeholder="请输入通知内容~"
                 show-word-limit
+                :autosize="{ minRows: 4, maxRows: 8 }"
                 type="textarea"
               />
             </div>
@@ -262,7 +288,7 @@
       <template #footer>
         <div style="flex: auto">
           <el-button @click="isDrawer = false">取消</el-button>
-          <el-button type="primary">确认</el-button>
+          <el-button type="primary" @click="addTaskConfirm">确认</el-button>
         </div>
       </template>
     </el-drawer>
@@ -270,7 +296,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, nextTick } from "vue";
+import { ref, reactive, onMounted, nextTick, watch } from "vue";
 // 引入接口，和ts类型
 import RobotAPI, {
   type RobotList,
@@ -278,6 +304,7 @@ import RobotAPI, {
   Robot,
   deleteRobotParamter,
   addTaskFormParamter,
+  getPersonNameList,
 } from "@/api/robot";
 // import
 import type { FormInstance, FormRules } from "element-plus";
@@ -333,13 +360,14 @@ let TaskForm = reactive<addTaskFormParamter>({
   spec: "",
 });
 
-// 添加任务表单中重复时间类型的选项
-let TaskFormOption = reactive([
-  { lable: "立即发送", value: "立即发送" },
-  { lable: "仅发送一次", value: "仅发送一次" },
-  { lable: "周重复", value: "周重复" },
-  { lable: "spec", value: "spec" },
-]);
+// 收集添加任务表单中周几的数据选项,[0,1,2,3,4,5,6]
+let weekList = ref([]);
+
+// 控制通知人员姓名下拉搜索框的数据搜索加载状态
+const loading = ref(false);
+
+// 存储通知人员模糊查询数据
+const nameList = ref<getPersonNameList[]>([]);
 
 // 获取当前页面机器人信息
 function getRobotList(page: number = 1) {
@@ -459,6 +487,19 @@ function selectChange(value: any) {
   console.log(deleteRobotIdArr.robot_ids);
 }
 
+// 重复时间类型发生改变时触发  value:下拉框的值
+function repeatTimeChange(value: any) {
+  // 1. 重置仅发送一次里的数据---可选时间框
+  // 2. 重置周重复里的数据---周几发送 + 具体时间
+  // 3. 重置spec里的数据---spec详情参考
+
+  // 清除具体时间detail_time的值
+  TaskForm.detail_time = "";
+  // 周重复里的周几发送信息也清空
+  weekList.value = [];
+  TaskForm.spec = "";
+}
+
 // 分页器下拉框改变时触发,一改变就返回第一页
 function handleSizeChange() {
   getRobotList();
@@ -490,10 +531,78 @@ const addRobotRules = reactive<FormRules<typeof AddRobotData>>({
 
 // 添加任务按钮
 function addTask(row: Robot) {
-  console.log("抽屉");
-  console.log(row);
   // 打开抽屉
   isDrawer.value = true;
+  TaskForm.robot_id = row.robot_id;
+  Object.assign(TaskForm, {
+    robot_id: "",
+    task_name: "",
+    repeat_time: "",
+    detail_time: "",
+    msg_text: {
+      at: {
+        atMobiles: [
+          {
+            atMobile: "",
+            name: "",
+          },
+        ],
+        isAtAll: false,
+      },
+      text: {
+        content: "",
+      },
+      msgtype: "text",
+    },
+    spec: "",
+  });
+}
+
+// 是否全体通知radio一改变就会触发的回调
+function allNoticeChange() {
+  TaskForm.msg_text.at.atMobiles = [
+    {
+      atMobile: "",
+      name: "",
+    },
+  ];
+}
+
+// 拼接需要的周重复的字符串
+function weekListChange(): string {
+  let repeatTimeStr = "周重复/";
+  repeatTimeStr += weekList.value.join("/");
+  return repeatTimeStr;
+}
+
+// 添加任务确认按钮
+function addTaskConfirm() {
+  if (TaskForm.repeat_time.includes("周重复")) {
+    TaskForm.repeat_time = weekListChange();
+  }
+}
+
+// 添加通知人员姓名框输入值一改变就触发
+function remoteMethod(value: string) {
+  // value：输入框输入的值
+  // 发请求，后端返回数据（比如说我输入一个谢字，然后发请求，后端返回给我的数据里有谢AA,谢BB,谢CC，我需要的是谢CC）
+  if (value) {
+    loading.value = true;
+    RobotAPI.getPersonName(value)
+      .then((res) => {
+        loading.value = false;
+        nameList.value = res.list;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+}
+
+// 通知人员姓名一修改就把对应人员手机号赋值
+function nameChange(value: string) {
+  let mobile = nameList.value.filter((item) => item.name == value)[0].mobile;
+  TaskForm.msg_text.at.atMobiles[0].atMobile = mobile;
 }
 
 // 组件一挂载就发请求获取机器人信息

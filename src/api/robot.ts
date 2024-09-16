@@ -38,7 +38,7 @@ class RobotAPI {
 
   // 获取通知人员姓名  模糊查询
   static getPersonName(name: string) {
-    return request<any, any>({
+    return request<any, getPersonNameResponse>({
       url: `/ding/user/robot@user?name=${name}`,
       method: "get",
     });
@@ -124,15 +124,6 @@ export interface msg_textParamter {
   msgtype: string; // 通知的类型
 }
 
-// 添加任务请求携带的参数的 ts类型
-export interface addTaskFormParamter {
-  robot_id: string; // 机器人id
-  task_name: string; // 任务名称
-  repeat_time: string; // 重复时间类型
-  detail_time: string; // 具体时间信息
-  spec: string; // 不知道是啥
-  msg_text: msg_textParamter; // 其他内容
-}
 // 添加任务请求携带的参数总结
 // 机器人id
 // 任务名称
@@ -145,3 +136,49 @@ export interface addTaskFormParamter {
 // --全体通知  不加通知人姓名
 // --不全体通知  加通知人姓名
 // 通知的内容
+// 添加任务请求携带的参数的 ts类型
+export interface addTaskFormParamter {
+  robot_id: string; // 机器人id
+  task_name: string; // 任务名称
+  repeat_time: string; // 重复时间类型
+  detail_time: string; // 具体时间信息
+  spec: string; // 不知道是啥
+  msg_text: msg_textParamter; // 其他内容
+}
+
+export interface getPersonNameList {
+  userid: string; // 人员id
+  name: string; // 人员姓名
+  mobile: string; // 手机号
+  Deleted: null;
+  CreatedAt: string; // 创建时间
+  UpdatedAt: string; // 更新时间
+  dept_id: number;
+  authority: {
+    CreatedAt: string;
+    UpdatedAt: string;
+    DeletedAt: null;
+    authorityId: number;
+    authorityName: string;
+    menus: null;
+    defaultRouter: string;
+  };
+  InterviewRecords: null;
+  is_study_week_paper: number;
+  is_leet_code: number;
+  is_jianshu_or_blog: number;
+  jianshu_addr: string;
+  blog_addr: string;
+  leetcode_addr: string;
+  auth_token: string;
+  ding_token: {};
+  ext_attrs: null;
+}
+
+//  获取通知人员姓名接口返回值的 ts类型
+export interface getPersonNameResponse {
+  list: getPersonNameList[]; // 人员具体数据
+  total: number; // 数据总数
+  page: number;
+  pageSize: number;
+}

@@ -11,7 +11,7 @@ import { usePermissionStore, useUserStore } from "@/store";
 
 export function setupPermission() {
   // 白名单路由
-  const whiteList = ["/login"];
+  const whiteList = ["/login", "/scanLogin"];
   console.log("前置守卫");
 
   // 前置守卫

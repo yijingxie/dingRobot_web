@@ -14,12 +14,12 @@ class AuthAPI {
   }
 
   // 扫码跳转接口
-  static reqRedirect(authCode: any) {
+  static reqRedirect(authCode: string) {
     return request<any, any>({
       url: "/ding/loginByDingDing",
       method: "post",
       data: {
-        authCode: data,
+        authCode: authCode,
       },
     });
   }
