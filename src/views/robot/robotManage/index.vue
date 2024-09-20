@@ -12,7 +12,7 @@
             />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" icon="Search" color="">搜索</el-button>
+            <el-button type="primary" icon="Search">搜索</el-button>
           </el-form-item>
           <el-form-item>
             <el-button icon="Refresh">重置</el-button>
@@ -157,14 +157,15 @@
       </template>
       <!-- 抽屉身体 -->
       <template #default>
-        <el-form>
+        <el-form ref="TaskFormRef" :model="TaskForm" :rules="TaskFormRules">
           <!-- 任务名称 -->
-          <el-form-item>
+          <el-form-item prop="task_name">
             <p>任务名称</p>
             <el-input v-model="TaskForm.task_name" style="width: 420px" />
           </el-form-item>
+
           <!-- 重复时间类型 -->
-          <el-form-item>
+          <el-form-item prop="repeat_time">
             <div>
               <p>重复时间类型</p>
               <el-select
@@ -181,8 +182,12 @@
               </el-select>
             </div>
           </el-form-item>
+
           <!-- 仅发送一次 -->
-          <el-form-item v-if="TaskForm.repeat_time == '仅发送一次'">
+          <el-form-item
+            v-if="TaskForm.repeat_time == '仅发送一次'"
+            prop="detail_time"
+          >
             <div>
               <p>可选时间框</p>
               <el-date-picker
@@ -193,12 +198,13 @@
               />
             </div>
           </el-form-item>
+
           <!-- 周重复 -->
-          <el-form-item v-if="TaskForm.repeat_time == '周重复'">
+          <el-form-item v-if="TaskForm.repeat_time == '周重复'" prop="weekList">
             <!-- 周几发送 -->
             <div>
               <p>请选择周几发送</p>
-              <el-checkbox-group v-model="weekList">
+              <el-checkbox-group v-model="TaskForm.weekList">
                 <el-checkbox label="周日" :value="0" />
                 <el-checkbox label="周一" :value="1" />
                 <el-checkbox label="周二" :value="2" />
@@ -208,6 +214,11 @@
                 <el-checkbox label="周六" :value="6" />
               </el-checkbox-group>
             </div>
+          </el-form-item>
+          <el-form-item
+            v-if="TaskForm.repeat_time == '周重复'"
+            prop="detail_time"
+          >
             <!-- 具体时间 -->
             <div>
               <p>具体时间</p>
@@ -216,16 +227,24 @@
                 arrow-control
                 placeholder="Arbitrary time"
                 value-format="HH:mm:ss"
+                prop="detail_time"
               />
             </div>
           </el-form-item>
+
           <!-- spec -->
-          <el-form-item v-if="TaskForm.repeat_time == 'spec'">
+          <el-form-item v-if="TaskForm.repeat_time == 'spec'" prop="spec">
             <div>
-              <p>spec(详情参考https://github.com/robfig/cron)</p>
-              <el-input v-model="TaskForm.spec" />
+              <p>
+                详情请参考
+                <a href="https://github.com/robfig/cron" style="color: #4080ff">
+                  https://github.com/robfig/cron
+                </a>
+              </p>
+              <el-input v-model="TaskForm.spec" style="width: 420px" />
             </div>
           </el-form-item>
+
           <!-- 是否全体通知 -->
           <el-form-item>
             <div>
@@ -239,8 +258,13 @@
               </el-radio-group>
             </div>
           </el-form-item>
+
           <!-- 通知人员姓名 -->
-          <el-form-item v-if="!TaskForm.msg_text.at.isAtAll">
+          <el-form-item
+            v-if="!TaskForm.msg_text.at.isAtAll"
+            :rules="TaskFormRules['msg_text.at.atMobiles.0.name']"
+            prop="msg_text.at.atMobiles.0.name"
+          >
             <div>
               <p>通知人员姓名</p>
               <el-select
@@ -261,14 +285,11 @@
                   :value="item.name"
                 />
               </el-select>
-              <!-- <el-input
-                v-model="TaskForm.msg_text.at.atMobiles[0].name"
-                style="width: 420px"
-              /> -->
             </div>
           </el-form-item>
+
           <!-- 通知内容 -->
-          <el-form-item>
+          <el-form-item prop="msg_text.text.content">
             <div>
               <p>通知内容</p>
               <el-input
@@ -296,7 +317,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, nextTick, watch } from "vue";
+import { ref, reactive, onMounted, nextTick } from "vue";
 // 引入接口，和ts类型
 import RobotAPI, {
   type RobotList,
@@ -358,16 +379,15 @@ let TaskForm = reactive<addTaskFormParamter>({
     msgtype: "text", // 通知类型
   },
   spec: "",
+  weekList: [], // 周几发送，[0,1,2,3,4,5,6]
 });
 
-// 收集添加任务表单中周几的数据选项,[0,1,2,3,4,5,6]
-let weekList = ref([]);
-
 // 控制通知人员姓名下拉搜索框的数据搜索加载状态
-const loading = ref(false);
-
+let loading = ref(false);
 // 存储通知人员模糊查询数据
-const nameList = ref<getPersonNameList[]>([]);
+let nameList = ref<getPersonNameList[]>([]);
+// 添加任务表单实例
+let TaskFormRef = ref();
 
 // 获取当前页面机器人信息
 function getRobotList(page: number = 1) {
@@ -496,7 +516,7 @@ function repeatTimeChange(value: any) {
   // 清除具体时间detail_time的值
   TaskForm.detail_time = "";
   // 周重复里的周几发送信息也清空
-  weekList.value = [];
+  TaskForm.weekList = [];
   TaskForm.spec = "";
 }
 
@@ -534,27 +554,9 @@ function addTask(row: Robot) {
   // 打开抽屉
   isDrawer.value = true;
   TaskForm.robot_id = row.robot_id;
-  Object.assign(TaskForm, {
-    robot_id: "",
-    task_name: "",
-    repeat_time: "",
-    detail_time: "",
-    msg_text: {
-      at: {
-        atMobiles: [
-          {
-            atMobile: "",
-            name: "",
-          },
-        ],
-        isAtAll: false,
-      },
-      text: {
-        content: "",
-      },
-      msgtype: "text",
-    },
-    spec: "",
+  // 重置该表单项，将其值重置为初始值，并移除校验结果
+  nextTick(() => {
+    TaskFormRef.value.resetFields();
   });
 }
 
@@ -571,15 +573,37 @@ function allNoticeChange() {
 // 拼接需要的周重复的字符串
 function weekListChange(): string {
   let repeatTimeStr = "周重复/";
-  repeatTimeStr += weekList.value.join("/");
+  repeatTimeStr += (TaskForm.weekList as number[]).join("/");
   return repeatTimeStr;
 }
 
 // 添加任务确认按钮
-function addTaskConfirm() {
+async function addTaskConfirm() {
+  // 表单校验，通过再发请求
+  await TaskFormRef.value.validate();
   if (TaskForm.repeat_time.includes("周重复")) {
     TaskForm.repeat_time = weekListChange();
   }
+
+  let Paramter = TaskForm;
+  delete Paramter.weekList;
+  // 提交任务数据，发请求
+  RobotAPI.addTask(Paramter)
+    .then((data) => {
+      isDrawer.value = false;
+      ElMessage({
+        type: "success",
+        message: "添加任务成功",
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+      isDrawer.value = false;
+      ElMessage({
+        type: "error",
+        message: "添加任务失败",
+      });
+    });
 }
 
 // 添加通知人员姓名框输入值一改变就触发
@@ -604,6 +628,53 @@ function nameChange(value: string) {
   let mobile = nameList.value.filter((item) => item.name == value)[0].mobile;
   TaskForm.msg_text.at.atMobiles[0].atMobile = mobile;
 }
+
+// detai_time的校验规则
+function detail_timeValidator(rule: any, value: any, callback: any) {
+  if (value) {
+    callback();
+  } else {
+    callback(new Error("请输入时间"));
+  }
+}
+
+// 添加任务表单校验规则
+const TaskFormRules = reactive<FormRules<typeof TaskForm>>({
+  task_name: [
+    { required: true, trigger: "blur", message: "请输入任务名称" },
+    { min: 2, trigger: "blur", message: "任务名称长度至少为2" },
+  ],
+  repeat_time: [
+    { required: true, trigger: "change", message: "至少要选择一项" },
+  ],
+  detail_time: [
+    {
+      type: "date",
+      required: true,
+      trigger: "change",
+      validator: detail_timeValidator,
+    },
+  ],
+  weekList: [
+    {
+      type: "array",
+      required: true,
+      trigger: "change",
+      message: "至少选择一项",
+    },
+  ],
+  spec: [{ required: true, trigger: "blur", message: "请输入spec" }],
+  "msg_text.at.atMobiles.0.name": [
+    {
+      required: true,
+      trigger: ["blur", "change"],
+      message: "请填写通知人员姓名",
+    },
+  ],
+  "msg_text.text.content": [
+    { required: true, trigger: "blur", message: "请输入通知内容" },
+  ],
+});
 
 // 组件一挂载就发请求获取机器人信息
 onMounted(() => {

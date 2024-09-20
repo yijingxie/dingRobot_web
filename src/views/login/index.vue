@@ -190,6 +190,7 @@ function handleLoginSubmit() {
       userStore
         .login(loginData.value)
         .then(() => {
+          console.log("*******");
           router.push("/");
         })
         .catch((error) => {
