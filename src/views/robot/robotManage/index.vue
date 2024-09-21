@@ -163,7 +163,6 @@
             <p>任务名称</p>
             <el-input v-model="TaskForm.task_name" style="width: 420px" />
           </el-form-item>
-
           <!-- 重复时间类型 -->
           <el-form-item prop="repeat_time">
             <div>
@@ -324,11 +323,11 @@ import RobotAPI, {
   addRobotParameter,
   Robot,
   deleteRobotParamter,
-  addTaskFormParamter,
   getPersonNameList,
 } from "@/api/robot";
+import TaskAPI, { type addTaskFormParamter } from "@/api/task";
 // import
-import type { FormInstance, FormRules } from "element-plus";
+import type { FormRules } from "element-plus";
 
 // 当前页码
 let pageNow = ref<number>(1);
@@ -588,7 +587,7 @@ async function addTaskConfirm() {
   let Paramter = TaskForm;
   delete Paramter.weekList;
   // 提交任务数据，发请求
-  RobotAPI.addTask(Paramter)
+  TaskAPI.addTask(Paramter)
     .then((data) => {
       isDrawer.value = false;
       ElMessage({
