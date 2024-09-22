@@ -476,9 +476,11 @@ function modifyTask(row: TaskResponse) {
           // 把周重复里的具体周几提取出来
           TaskForm.weekList = extractRepeat_time(data.front_repeat_time);
           TaskForm.repeat_time = "周重复";
-        }
-        if (data.front_repeat_time.includes("spec")) {
+        } else if (data.front_repeat_time.includes("spec")) {
+          // 这样写是因为当后端返回周重复的数据时，不知道为什么还会有spec数据？？可能是写的时候添加的错误信息？？不知道先这样写吧
           TaskForm.spec = data.spec;
+        } else {
+          TaskForm.repeat_time = data.front_repeat_time;
         }
       })
       .catch((error) => {
