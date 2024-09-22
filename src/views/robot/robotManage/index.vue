@@ -161,7 +161,11 @@
           <!-- 任务名称 -->
           <el-form-item prop="task_name">
             <p>任务名称</p>
-            <el-input v-model="TaskForm.task_name" style="width: 420px" />
+            <el-input
+              v-model="TaskForm.task_name"
+              style="width: 420px"
+              placeholder="请输入任务名称"
+            />
           </el-form-item>
           <!-- 重复时间类型 -->
           <el-form-item prop="repeat_time">
@@ -271,6 +275,7 @@
               <p>通知人员姓名</p>
               <el-select
                 v-model="TaskForm.msg_text.at.atMobiles[0].name"
+                clearable
                 filterable
                 remote
                 reserve-keyword
