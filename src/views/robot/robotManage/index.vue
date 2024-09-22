@@ -199,7 +199,10 @@
           </el-form-item>
 
           <!-- 周重复 -->
-          <el-form-item v-if="TaskForm.repeat_time == '周重复'" prop="weekList">
+          <el-form-item
+            v-if="TaskForm.repeat_time.includes('周重复')"
+            prop="weekList"
+          >
             <!-- 周几发送 -->
             <div>
               <p>请选择周几发送</p>
@@ -215,7 +218,7 @@
             </div>
           </el-form-item>
           <el-form-item
-            v-if="TaskForm.repeat_time == '周重复'"
+            v-if="TaskForm.repeat_time.includes('周重复')"
             prop="detail_time"
           >
             <!-- 具体时间 -->

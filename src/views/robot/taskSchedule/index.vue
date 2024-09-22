@@ -172,7 +172,7 @@
             </div>
           </el-form-item>
           <el-form-item
-            v-if="TaskForm.repeat_time == '周重复'"
+            v-if="TaskForm.repeat_time.includes('周重复')"
             prop="detail_time"
           >
             <!-- 具体时间 -->
@@ -497,9 +497,9 @@ async function modifyTaskConfirm() {
     TaskForm.repeat_time = weekListChange();
   }
 
-  let Paramter = TaskForm;
+  let Paramter = { ...TaskForm };
   // 不论修改前任务是什么状态，修改后都要进入继续状态（开启状态）
-  TaskForm.is_suspend = false;
+  Paramter.is_suspend = false;
   delete Paramter.weekList;
   // 提交修改的任务数据，发请求
   TaskAPI.updateTask(Paramter)
@@ -550,7 +550,7 @@ function updateTaskStatus(row: TaskResponse) {
       if (data.front_repeat_time.includes("spec")) {
         TaskForm.spec = data.spec;
       }
-      let Paramter = TaskForm;
+      let Paramter = { ...TaskForm };
       delete Paramter.weekList;
       Paramter.is_suspend = !Paramter.is_suspend;
       TaskAPI.updateTask(Paramter)
