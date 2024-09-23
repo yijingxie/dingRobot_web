@@ -34,11 +34,19 @@ class CheckAPI {
   }
 
   // 更新考勤组信息
-  static updateAttenGroup(data: any) {
+  static updateAttenGroup(data: updateAttenGroupParamter) {
     return request<any, any>({
       url: "/ding/attendanceGroup/updateAttendanceGroup",
       method: "put",
       data: data,
+    });
+  }
+
+  // 同步考勤组信息到数据库
+  static importAttendGroupData() {
+    return request<any, any>({
+      url: "/ding/attendanceGroup/ImportAttendanceGroupData",
+      method: "get",
     });
   }
 }

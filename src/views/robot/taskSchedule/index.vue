@@ -325,6 +325,7 @@ let TaskFormRef = ref();
 // 存储通知人员模糊查询数据
 let nameList = ref<getPersonNameList[]>([]);
 
+// 注意，时间重复类型为“立即发送”的任务不会出现在任务列表里
 // 获取当前页面全部任务
 function getTaskList(page: number = 1) {
   pageNow.value = page;
@@ -498,7 +499,7 @@ async function modifyTaskConfirm() {
     TaskForm.repeat_time = weekListChange();
   }
 
-  let Paramter = { ...TaskForm };
+  let Paramter = JSON.parse(JSON.stringify(TaskForm));
   // 不论修改前任务是什么状态，修改后都要进入继续状态（开启状态）
   Paramter.is_suspend = false;
   delete Paramter.weekList;
@@ -508,7 +509,7 @@ async function modifyTaskConfirm() {
       isDrawer.value = false;
       ElMessage({
         type: "success",
-        message: "任务修改成功！",
+        message: "任务修改成功，任务开启！",
       });
       getTaskList(
         TaskList.value.length >= 1 ? pageNow.value : pageNow.value - 1
@@ -551,7 +552,7 @@ function updateTaskStatus(row: TaskResponse) {
       if (data.front_repeat_time.includes("spec")) {
         TaskForm.spec = data.spec;
       }
-      let Paramter = { ...TaskForm };
+      let Paramter = JSON.parse(JSON.stringify(TaskForm));
       delete Paramter.weekList;
       Paramter.is_suspend = !Paramter.is_suspend;
       TaskAPI.updateTask(Paramter)
@@ -559,7 +560,7 @@ function updateTaskStatus(row: TaskResponse) {
           isDrawer.value = false;
           ElMessage({
             type: "success",
-            message: TaskForm.is_suspend ? "任务暂停成功" : "任务继续",
+            message: TaskForm.is_suspend ? "任务继续" : "任务暂停成功",
           });
           getTaskList();
         })

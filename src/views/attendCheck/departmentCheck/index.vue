@@ -8,7 +8,7 @@
             <el-input
               v-model="searchContent"
               size="default"
-              placeholder="ID / 部门名称 / 负责人"
+              placeholder="部门名称"
               style="width: 220px"
             />
           </el-form-item>

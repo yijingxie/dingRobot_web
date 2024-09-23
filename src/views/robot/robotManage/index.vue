@@ -592,7 +592,9 @@ async function addTaskConfirm() {
     TaskForm.repeat_time = weekListChange();
   }
 
-  let Paramter = TaskForm;
+  // 如果直接写let Paramter = TaskForm，会把TaskForm的地址给Paramter，但是我需要复制一份和TaskForm的值一样但地址不同的给Paramter
+  // let Paramter = { ...TaskForm };不这样写，是因为这个方法只能深拷贝对象的第一层，如果对象中包含嵌套对象或数组，则不会进行深拷贝。
+  let Paramter = JSON.parse(JSON.stringify(TaskForm));
   delete Paramter.weekList;
   // 提交任务数据，发请求
   TaskAPI.addTask(Paramter)
