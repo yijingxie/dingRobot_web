@@ -24,6 +24,23 @@ class CheckAPI {
       data: data,
     });
   }
+
+  // 获取所有考勤组信息
+  static getAttendGropuList(page: number, pageSize: number) {
+    return request<any, getAttendGroupListResponse>({
+      url: `/ding/attendanceGroup/GetAttendanceGroupList?page=${page}&pageSize=${pageSize}`,
+      method: "get",
+    });
+  }
+
+  // 更新考勤组信息
+  static updateAttenGroup(data: any) {
+    return request<any, any>({
+      url: "/ding/attendanceGroup/updateAttendanceGroup",
+      method: "put",
+      data: data,
+    });
+  }
 }
 
 export default CheckAPI;
@@ -88,9 +105,9 @@ export interface userResponse {
   ext_attrs: null;
 }
 
-/*-------------发请求参数 ts：更新部门考勤信息----------------*/
+/*-------------发请求参数 ts：更新部门考勤信息接口----------------*/
 export interface updateCheckListParamter {
-  ResponsibleUserIds: string; // 负责人id
+  ResponsibleUserIds: string[]; // 负责人id
   dept_id: number; // 部门id
   is_attendance_week_paper: boolean; // 是否开启考勤周报
   is_jianshu_or_blog: number;
@@ -98,4 +115,50 @@ export interface updateCheckListParamter {
   is_robot_attendance: boolean; // 是否开启考勤
   is_send_first_person: 0;
   robot_token: string; // 机器人token
+}
+
+/*-------------返回数据 ts：获取所有考勤组信息接口----------------*/
+export interface getAttendGroupListResponse {
+  list: attendGroupListResponse[];
+  total: number; // 数据总数
+  page: number; // 当前页码
+  pageSize: number; // 一页有多少个数据
+}
+
+// 单个考勤组信息
+export interface attendGroupListResponse {
+  CreatedAt: string;
+  UpdatedAt: string; // 更新时间
+  DeletedAt: null;
+  group_id: number; // 考勤组id
+  group_name: string; // 考勤组名称
+  member_count: number; // 考勤组成员总数
+  work_day_list: null;
+  classes_list: null;
+  selected_class: null;
+  robot_alter_task_id: number; // 提醒考勤定时任务id
+  robot_attend_task_id: number; // 考勤定时任务id
+  alert_spec: string; // 提醒规则
+  attend_spec: string; // 考勤规则
+  rest_times: null;
+  is_alter_attendance: boolean; // 是否开启考勤提醒
+  is_robot_attendance: boolean; // 是否开启考勤
+  is_send_first_person: boolean;
+  is_in_school: boolean; // 是否在校
+  alert_time: number; // 提前多少分钟提醒
+  delay_time: number; // 延迟多少分钟考勤
+  next_time: string; // 下一次考勤时间
+  is_attend_week_paper: boolean; // 是否开启考勤周报
+}
+
+/*-------------发请求参数 ts：更新考勤组信息接口----------------*/
+export interface updateAttenGroupParamter {
+  alert_time: number; // 提前多少分钟提醒
+  delay_time: number; // 延迟多少分钟考勤
+  group_id: number; // 考勤组id
+  // is_alert_attendance: boolean,   其实这里应该是写【is_alert_attendance】的，但是估计是后端字段单词打错了，现在先按照后端的【is_alter_attendance】来
+  is_alter_attendance: boolean; // 是否开启考勤提醒
+  is_attend_week_paper: boolean; // 是否考勤周报
+  is_in_school: boolean; // 是否在校
+  is_robot_attendance: boolean; // 是否开启考勤
 }

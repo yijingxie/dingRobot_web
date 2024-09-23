@@ -6,16 +6,19 @@
         <el-form :inline="true">
           <el-form-item label="关键字">
             <el-input
+              v-model="searchContent"
               size="default"
               placeholder="ID / 部门名称 / 负责人"
               style="width: 220px"
             />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" icon="Search">搜索</el-button>
+            <el-button type="primary" icon="Search" @click="search">
+              搜索
+            </el-button>
           </el-form-item>
           <el-form-item>
-            <el-button icon="Refresh">重置</el-button>
+            <el-button icon="Refresh" @click="reset">重置</el-button>
           </el-form-item>
         </el-form>
       </el-card>
@@ -148,7 +151,9 @@
       <!-- 抽屉底部 -->
       <template #footer>
         <el-button @click="isDrawer = false">取消</el-button>
-        <el-button type="primary">确认</el-button>
+        <el-button type="primary" @click="updateCheckListConfirm">
+          确认
+        </el-button>
       </template>
     </el-drawer>
   </div>
@@ -171,17 +176,15 @@ let pageSize = ref<number>(5);
 let total = ref<number>(0);
 // 全部部门考勤信息列表
 let checkList = ref<checkListResponse[]>([]);
-// 部门成员信息列表
-// let userList = ref<userResponse[]>([]);
 // 搜索框搜索的内容
-let search = ref<string>("");
+let searchContent = ref<string>("");
 // 控制查看全部对话框的显示与隐藏
 let isDialog = ref<boolean>(false);
 // 控制修改的抽屉的显示与隐藏
 let isDrawer = ref<boolean>(false);
 // 修改按钮抽屉表单收集
 let checkForm = reactive<updateCheckListParamter>({
-  ResponsibleUserIds: "", // 负责人id
+  ResponsibleUserIds: [], // 负责人id
   dept_id: 0, // 部门id
   is_attendance_week_paper: true, // 是否开启考勤周报
   is_jianshu_or_blog: 0,
@@ -200,11 +203,12 @@ let loading = ref(false);
 let nameList = ref<getPersonNameList[]>([]);
 // checkForm表单实例
 let checkFormRef = ref();
+// 搜索框搜索的内容
 
 // 获取全部部门考勤信息
 function getCheckList(page: number = 1) {
   pageNow.value = page;
-  CheckAPI.getCheckList(pageNow.value, pageSize.value, search.value)
+  CheckAPI.getCheckList(pageNow.value, pageSize.value, searchContent.value)
     .then((data) => {
       total.value = data.total;
       checkList.value = data.list;
@@ -245,7 +249,7 @@ function updateCheckList(row: checkListResponse) {
   // 赋值抽屉信息
   if (row.ResponsibleUsers) {
     manager_name_drawer.value = row.ResponsibleUsers[0].name;
-    checkForm.ResponsibleUserIds = row.ResponsibleUsers[0].userid;
+    checkForm.ResponsibleUserIds.push(row.ResponsibleUsers[0].userid);
   }
   dept_name_drawer.value = row.name;
   checkForm.dept_id = row.dept_id;
@@ -275,7 +279,7 @@ function remoteMethod(value: string) {
 function nameChange(value: string) {
   // value: 选中的值，例如谢xx，王xx，张xx
   let manageId = nameList.value.filter((item) => item.name == value)[0].userid;
-  checkForm.ResponsibleUserIds = manageId;
+  checkForm.ResponsibleUserIds.push(manageId);
 }
 
 // checkFormRules表单校验规则
@@ -284,6 +288,40 @@ const checkFormRules = reactive<FormRules<typeof checkForm>>({
     { required: true, trigger: "blur", message: "请输入对应群的token" },
   ],
 });
+
+// 修改部门考勤信息确认按钮
+async function updateCheckListConfirm() {
+  // 表单校验通过，才发请求
+  await checkFormRef.value.validate();
+  CheckAPI.updateCheckList(checkForm)
+    .then((data) => {
+      isDrawer.value = false;
+      ElMessage({
+        type: "success",
+        message: "修改成功",
+      });
+      getCheckList(pageNow.value);
+    })
+    .catch((error) => {
+      isDrawer.value = false;
+      ElMessage({
+        type: "error",
+        message: "修改失败",
+      });
+      console.log(error);
+    });
+}
+
+// 搜索框确认按钮
+function search() {
+  getCheckList();
+}
+
+// 重置按钮
+function reset() {
+  searchContent.value = "";
+  getCheckList();
+}
 
 onMounted(() => {
   getCheckList();

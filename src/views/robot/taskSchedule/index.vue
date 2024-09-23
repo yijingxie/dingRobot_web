@@ -60,6 +60,7 @@
             label="下次执行时间"
             align="center"
             prop="next_time"
+            :formatter="formatterNextTime"
             show-overflow-tooltip
           />
           <el-table-column label="操作" align="center" width="250">
@@ -603,6 +604,12 @@ function search() {}
 function reset() {
   TaskName.value = "";
   getTaskList();
+}
+
+// 格式化下次执行时间  2024-09-29T10:55:40+08:00  →  2024-09-29 10:55:40
+function formatterNextTime(row: any, column: any, cellValue: any, index: any) {
+  let time = cellValue.replace("T", " ").replace(/\+.*$/, "");
+  return time;
 }
 
 onMounted(() => {
