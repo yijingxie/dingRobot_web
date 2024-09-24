@@ -33,7 +33,7 @@ function scanLogin() {
         localStorage.setItem("authCode", authCode);
         localStorage.setItem("username", res.name);
         localStorage.setItem(TOKEN_KEY, res.auth_token);
-        router.push("/home");
+        router.push("/");
       })
       .catch((error) => {
         ElMessage({

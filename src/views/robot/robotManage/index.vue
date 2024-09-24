@@ -682,6 +682,7 @@ const TaskFormRules = reactive<FormRules<typeof TaskForm>>({
   ],
   "msg_text.text.content": [
     { required: true, trigger: "blur", message: "请输入通知内容" },
+    { max: 2000, trigger: "blur", message: "字数不能超过2000字" },
   ],
 });
 

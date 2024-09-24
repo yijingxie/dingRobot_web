@@ -46,30 +46,30 @@ export const useUserStore = defineStore("user", () => {
       "https://foruda.gitee.com/images/1723603502796844527/03cdca2a_716974.gif?imageView2/1/w/80/h/80";
     // user.value.avatar =
     //   "https://q2.itc.cn/q_70/images03/20240807/9efb7d3e616440c6ab1d7e1d9b9be14f.jpeg";
-    user.value.perms = [
-      "sys:menu:delete",
-      "sys:dept:edit",
-      "sys:dict_type:add",
-      "sys:dict:edit",
-      "sys:dict:delete",
-      "sys:dict_type:edit",
-      "sys:menu:add",
-      "sys:user:add",
-      "sys:role:edit",
-      "sys:dept:delete",
-      "sys:user:edit",
-      "sys:user:delete",
-      "sys:user:password:reset",
-      "sys:dept:add",
-      "sys:role:delete",
-      "sys:dict_type:delete",
-      "sys:menu:edit",
-      "sys:dict:add",
-      "sys:role:add",
-      "sys:user:query",
-      "sys:user:export",
-      "sys:user:import",
-    ];
+    // user.value.perms = [
+    //   "sys:menu:delete",
+    //   "sys:dept:edit",
+    //   "sys:dict_type:add",
+    //   "sys:dict:edit",
+    //   "sys:dict:delete",
+    //   "sys:dict_type:edit",
+    //   "sys:menu:add",
+    //   "sys:user:add",
+    //   "sys:role:edit",
+    //   "sys:dept:delete",
+    //   "sys:user:edit",
+    //   "sys:user:delete",
+    //   "sys:user:password:reset",
+    //   "sys:dept:add",
+    //   "sys:role:delete",
+    //   "sys:dict_type:delete",
+    //   "sys:menu:edit",
+    //   "sys:dict:add",
+    //   "sys:role:add",
+    //   "sys:user:query",
+    //   "sys:user:export",
+    //   "sys:user:import",
+    // ];
     // return new Promise<UserInfo>((resolve, reject) => {
     //   UserAPI.getInfo()
     //     .then((data) => {
