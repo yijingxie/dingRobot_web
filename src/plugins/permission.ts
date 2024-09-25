@@ -48,11 +48,7 @@ export function setupPermission() {
             // 获取用户角色
             await userStore.getUserInfo();
             // 生成动态路由
-            const dynamicRoutes = await permissionStore.generateRoutes();
-            // // 把异步路由加到router里面
-            dynamicRoutes.forEach((route: RouteRecordRaw) =>
-              router.addRoute(route)
-            );
+            await permissionStore.generateRoutes();
             next({ ...to, replace: true });
           } catch (error) {
             // 移除 token 并重定向到登录页，携带当前页面路由作为跳转参数

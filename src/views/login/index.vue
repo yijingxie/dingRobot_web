@@ -252,9 +252,8 @@ function checkCapslock(event: KeyboardEvent) {
 // 获取重定向的地址
 function redirectToDingTalk() {
   const redirectUrl =
-    "https://login.dingtalk.com/oauth2/challenge.htm?redirect_uri=http%3A%2F%2F127.0.0.1%3A3000%2F%23%2FscanLogin&response_type=code&client_id=dinglyjekzn80ebnlyge&scope=openid&state=dddd&prompt=consent";
+    "https://login.dingtalk.com/oauth2/auth?redirect_uri=http%3A%2F%2F127.0.0.1%3A3000%2F%23%2FscanLogin&response_type=code&client_id=dinglyjekzn80ebnlyge&scope=openid&state=dddd&prompt=consent";
   window.location.href = redirectUrl;
-  // router.push("/scanLogin");
 }
 
 // 切换为扫码登录

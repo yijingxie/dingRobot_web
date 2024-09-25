@@ -2,6 +2,7 @@ import { RouteRecordRaw } from "vue-router";
 import { constantRoutes } from "@/router";
 import { store } from "@/store";
 import MenuAPI, { RouteVO } from "@/api/menu";
+import router from "@/router";
 
 const modules = import.meta.glob("../../views/**/**.vue");
 const Layout = () => import("@/layout/index.vue");
@@ -17,9 +18,11 @@ export const usePermissionStore = defineStore("permission", () => {
    */
   function generateRoutes() {
     const result: any = MenuAPI.getRoutes();
+    // 转换路由数据为组件
     const dynamicRoutes = transformRoutes(result.data);
+    // 把异步路由加到router里面(注册路由)
+    dynamicRoutes.forEach((route: RouteRecordRaw) => router.addRoute(route));
     routes.value = constantRoutes.concat(dynamicRoutes);
-    return dynamicRoutes;
     // return new Promise<RouteRecordRaw[]>((resolve, reject) => {
     // 通过接口获取该用户的动态路由
     // MenuAPI.getRoutes()

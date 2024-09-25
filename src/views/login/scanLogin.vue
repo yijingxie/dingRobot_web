@@ -30,10 +30,10 @@ function scanLogin() {
     // 调用跳转接口
     AuthAPI.reqRedirect(authCode)
       .then((res) => {
-        localStorage.setItem("authCode", authCode);
-        localStorage.setItem("username", res.name);
-        localStorage.setItem(TOKEN_KEY, res.auth_token);
-        router.push("/");
+        localStorage.setItem("authCode", authCode); // 本地存储authCode
+        localStorage.setItem("username", res.name); // 本地存储username
+        localStorage.setItem(TOKEN_KEY, res.auth_token); // 本地存储token
+        router.push("/"); // 跳到首页
       })
       .catch((error) => {
         ElMessage({
@@ -46,6 +46,7 @@ function scanLogin() {
   }
 }
 
+// 扫码登录成功后，一进入这个页面，就获取authCode发请求
 onMounted(() => {
   scanLogin();
 });
